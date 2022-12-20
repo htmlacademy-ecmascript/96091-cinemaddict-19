@@ -6,13 +6,15 @@ import CardContainerView from '../view/card-container-view.js';
 import CardListView from '../view/card-list-view.js';
 import CardView from '../view/card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
+import StatisticView from '../view/statistic-view.js';
 
 const AMOUNT_CARD = 5;
 
 export default class PageMainPresenter {
 
-  constructor({container}) {
-    this.container = container;
+  constructor({pageMainContainer, pageFooterContainer}) {
+    this.pageMainContainer = pageMainContainer;
+    this.pageFooterContainer = pageFooterContainer;
   }
 
   init() {
@@ -21,9 +23,9 @@ export default class PageMainPresenter {
     const cardContainerComponent = new CardContainerView();
     const cardListComponent = new CardListView();
 
-    render(new FilterView(), this.container);
-    render(new SortView(), this.container);
-    render(mainCardContainerComponent, this.container);
+    render(new FilterView(), this.pageMainContainer);
+    render(new SortView(), this.pageMainContainer);
+    render(mainCardContainerComponent, this.pageMainContainer);
     render(cardContainerComponent, mainCardContainerComponent.getElement());
     render(cardListComponent, cardContainerComponent.getElement());
 
@@ -32,5 +34,7 @@ export default class PageMainPresenter {
     }
 
     render(new ShowMoreButtonView(), cardContainerComponent.getElement());
+
+    render(new StatisticView(), this.pageFooterContainer);
   }
 }
