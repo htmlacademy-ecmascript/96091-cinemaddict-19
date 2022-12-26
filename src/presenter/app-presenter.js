@@ -13,14 +13,15 @@ const AMOUNT_CARD = 5;
 
 export default class AppPresenter {
 
-  constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
+  constructor({pageMainElement, pageStatisticsElement, pageHeaderElement, appModel}) {
     this.pageMainElement = pageMainElement;
     this.pageStatisticsElement = pageStatisticsElement;
     this.pageHeaderElement = pageHeaderElement;
+    this.appModel = appModel;
   }
 
   init() {
-    const mainComponent = new MainCardContainerView();
+    this.mainComponent = new MainCardContainerView();
 
     this.cardDetailsPresenter = new CardDetailsPresenter();
     this.cardDetailsPresenter.init();
@@ -29,13 +30,13 @@ export default class AppPresenter {
 
     render(new FilterView(), this.pageMainElement);
     render(new SortView(), this.pageMainElement);
-    render(mainComponent, this.pageMainElement);
+    render(this.mainComponent, this.pageMainElement);
 
     for (let i = 0; i < AMOUNT_CARD; i++) {
-      render(new CardView(), mainComponent.getFilmListContainer());
+      render(new CardView(), this.mainComponent.getFilmListContainer());
     }
 
-    render(new ShowMoreButtonView(), mainComponent.getFilmList());
+    render(new ShowMoreButtonView(), this.mainComponent.getFilmList());
 
     render(new StatisticView(), this.pageStatisticsElement);
   }
