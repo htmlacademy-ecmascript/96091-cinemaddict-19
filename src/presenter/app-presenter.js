@@ -8,9 +8,6 @@ import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import CardDetailsPresenter from './card-details-presenter.js';
 
-
-const AMOUNT_CARD = 5;
-
 export default class AppPresenter {
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement, appModel}) {
@@ -21,9 +18,12 @@ export default class AppPresenter {
   }
 
   init() {
+    this.cards = [...this.appModel.getCards()];
     this.mainComponent = new MainCardContainerView();
 
-    this.cardDetailsPresenter = new CardDetailsPresenter();
+    this.cardDetailsPresenter = new CardDetailsPresenter({
+      card: this.cards[0]
+    });
     this.cardDetailsPresenter.init();
 
     render(new UserView(), this.pageHeaderElement);
@@ -32,8 +32,8 @@ export default class AppPresenter {
     render(new SortView(), this.pageMainElement);
     render(this.mainComponent, this.pageMainElement);
 
-    for (let i = 0; i < AMOUNT_CARD; i++) {
-      render(new CardView(), this.mainComponent.getFilmListContainer());
+    for (let i = 1; i < this.cards.length; i++) {
+      render(new CardView({card: this.cards[i]}), this.mainComponent.getFilmListContainer());
     }
 
     render(new ShowMoreButtonView(), this.mainComponent.getFilmList());
