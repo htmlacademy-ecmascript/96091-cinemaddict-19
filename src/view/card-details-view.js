@@ -1,5 +1,6 @@
 import {createElement} from '../render.js';
 import {humanizeReleaseDate, humanizeCommentDate} from '../utils.js';
+import {PATH_EMOJI} from '../const.js';
 
 function creatCardDetailsGenreTemplate(genres) {
   return (
@@ -26,7 +27,7 @@ function creatCardDetailsCommentsTemplate(comments) {
     comments.map((comment) => (
       `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src="${comment.emotion}" width="55" height="55" alt="emoji-smile">
+        <img src="${PATH_EMOJI[comment.emotion]}" width="55" height="55" alt="emoji-${comment.emotion}">
       </span>
       <div>
         <p class="film-details__comment-text">${comment.comment}</p>

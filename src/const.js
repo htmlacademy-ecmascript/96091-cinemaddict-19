@@ -1,10 +1,10 @@
-const EMOTION = {
-  SMILE: './images/emoji/smile.png',
-  SLEEPING: './images/emoji/sleeping.png',
-  PUKE: './images/emoji/puke.png',
-  ANGRY: './images/emoji/angry.png'
+const PATH_EMOJI = {
+  smile: './images/emoji/smile.png',
+  sleeping: './images/emoji/sleeping.png',
+  puke: './images/emoji/puke.png',
+  angry: './images/emoji/angry.png'
 };
 
 const AMOUNT_SYMBOL = 140;
 
-export {EMOTION, AMOUNT_SYMBOL};
+export {PATH_EMOJI, AMOUNT_SYMBOL};
