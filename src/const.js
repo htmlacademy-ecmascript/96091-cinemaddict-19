@@ -1,3 +1,10 @@
-const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
+const EMOTION = {
+  SMILE: './images/emoji/smile.png',
+  SLEEPING: './images/emoji/sleeping.png',
+  PUKE: './images/emoji/puke.png',
+  ANGRY: './images/emoji/angry.png'
+};
 
-export {EMOTIONS};
+const AMOUNT_SYMBOL = 140;
+
+export {EMOTION, AMOUNT_SYMBOL};

@@ -25,12 +25,12 @@ const mockCards = [
       },
       duration: '1h 18m',
       genres: [
-        'Драматический', 'фильм-нуар', 'Тайна'
+        'Драматический', 'Артхаус', 'Тайна'
       ],
       description: 'Великий Фламарион sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: false,
+      isInWatchlist: false,
       isWatched: true,
       watchingDate: new Date('2022-03-30'),
       isFavorite: false
@@ -45,7 +45,7 @@ const mockCards = [
       title: 'Танец жизни',
       alternativeTitle: 'Тот самый танец',
       totalRating: 8.3,
-      poster: '/public/images/posters/the-dance-of-life.jpg',
+      poster: './images/posters/the-dance-of-life.jpg',
       ageRating: '16+',
       director: 'Никита Михалков',
       writers: [
@@ -65,7 +65,7 @@ const mockCards = [
       description: 'Танец жизни sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: true,
+      isInWatchlist: true,
       isWatched: true,
       watchingDate: new Date('2022-03-30'),
       isFavorite: true
@@ -80,7 +80,7 @@ const mockCards = [
       title: 'Полынная тропа',
       alternativeTitle: 'Полынный газон',
       totalRating: 3.2,
-      poster: './public/images/posters/sagebrush-trail.jpg',
+      poster: './images/posters/sagebrush-trail.jpg',
       ageRating: '0+',
       director: 'Вася Петров',
       writers: [
@@ -91,7 +91,7 @@ const mockCards = [
       ],
       release: {
         date: new Date('1933-01-02'),
-        releaseCountry: 'Северная Карей'
+        releaseCountry: 'Северная Корея'
       },
       duration: '54m',
       genres: [
@@ -100,7 +100,7 @@ const mockCards = [
       description: 'Полынная тропа sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: false,
+      isInWatchlist: false,
       isWatched: false,
       watchingDate: null,
       isFavorite: false
@@ -130,12 +130,12 @@ const mockCards = [
       },
       duration: '1h 59m',
       genres: [
-        'Ужасы', 'Триллер','Фантастика'
+        'Ужасы'
       ],
       description: 'Человек c золотой рукой sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: true,
+      isInWatchlist: true,
       isWatched: true,
       watchingDate: new Date('2020-08-25'),
       isFavorite: true
@@ -163,12 +163,12 @@ const mockCards = [
       },
       duration: '1h 21m',
       genres: [
-        'Сказка', 'Фентези','Приключения'
+        'Сказка', 'Фентези'
       ],
       description: 'Санта-Клаус побеждает марсиан sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: true,
+      isInWatchlist: true,
       isWatched: false,
       watchingDate: null,
       isFavorite: true
@@ -198,12 +198,12 @@ const mockCards = [
       },
       duration: '16m',
       genres: [
-        'Боевик', 'Коммедия'
+        'Боевик'
       ],
       description: 'Моряк Попай встречает моряка Синдбада sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.'
     },
     userDetails: {
-      isInwatchlist: false,
+      isInWatchlist: false,
       isWatched: false,
       watchingDate: null,
       isFavorite: false
