@@ -1,54 +1,9 @@
 import {createElement} from '../render.js';
 import {humanizeReleaseDate, humanizeCommentDate} from '../utils.js';
-import {PATH_EMOJI} from '../const.js';
-
-function creatCardDetailsGenreTemplate(genres) {
-  return (
-    `<td class="film-details__term">${
-      genres.length > 1 ? 'Genres' : 'Genre'
-    }</td>
-    <td class="film-details__cell">
-      ${genres.map((genre) => (
-      `<span class="film-details__genre">${genre}</span>`
-    )).join('')}</td>`
-  );
-}
-
-function getCardDetailsClassName(isActive) {
-  return (
-    isActive
-      ? 'film-details__control-button--active'
-      : ''
-  );
-}
-
-function creatCardDetailsCommentsTemplate(comments) {
-  return (
-    comments.map((comment) => (
-      `<li class="film-details__comment">
-      <span class="film-details__comment-emoji">
-        <img src="${PATH_EMOJI[comment.emotion]}" width="55" height="55" alt="emoji-${comment.emotion}">
-      </span>
-      <div>
-        <p class="film-details__comment-text">${comment.comment}</p>
-        <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${comment.author}</span>
-          <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-          <button class="film-details__comment-delete">Delete</button>
-        </p>
-      </div>
-    </li>`
-    )).join('')
-  );
-}
+import {EMOJI_IMAGES_SRC} from '../const.js';
 
 function creatCardDetailsTemplate(card) {
   const {comments, filmInfo, userDetails} = card;
-
-  const genreTemplate = creatCardDetailsGenreTemplate(filmInfo.genres);
-
-  const commentTemplate = creatCardDetailsCommentsTemplate(comments);
-
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -101,7 +56,8 @@ function creatCardDetailsTemplate(card) {
                 <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
               </tr>
               <tr class="film-details__row">
-                ${genreTemplate}
+                <td class="film-details__term">${filmInfo.genres.length > 1 ? 'Genres' : 'Genre'}</td>
+                <td class="film-details__cell">${filmInfo.genres.map((genre) => (`<span class="film-details__genre">${genre}</span>`)).join('')}</td>
               </tr>
             </table>
 
@@ -112,9 +68,9 @@ function creatCardDetailsTemplate(card) {
         </div>
 
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button ${getCardDetailsClassName(userDetails.isInWatchlist)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button ${getCardDetailsClassName(userDetails.isWatched)} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button ${getCardDetailsClassName(userDetails.isFavorite)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button ${userDetails.isInWatchlist ? 'film-details__control-button--active' : ''} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+          <button type="button" class="film-details__control-button ${userDetails.isWatched ? 'film-details__control-button--active' : ''} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+          <button type="button" class="film-details__control-button ${userDetails.isFavorite ? 'film-details__control-button--active' : ''} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
         </section>
       </div>
 
@@ -123,7 +79,21 @@ function creatCardDetailsTemplate(card) {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${commentTemplate}
+            ${comments.map((comment) => (
+    `<li class="film-details__comment">
+      <span class="film-details__comment-emoji">
+        <img src="${EMOJI_IMAGES_SRC[comment.emotion]}" width="55" height="55" alt="emoji-${comment.emotion}">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${comment.comment}</p>
+        <p class="film-details__comment-info">
+          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
+          <button class="film-details__comment-delete">Delete</button>
+        </p>
+      </div>
+    </li>`
+  )).join('')}
           </ul>
 
           <form class="film-details__new-comment" action="" method="get">
@@ -164,7 +134,7 @@ function creatCardDetailsTemplate(card) {
 
 export default class CardDetailsView {
 
-  constructor({card}) {
+  constructor(card) {
     this.card = card;
   }
 

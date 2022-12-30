@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {AMOUNT_SYMBOL} from './const.js';
+import {DESCRIPTION_MAX_LENGTH} from './const.js';
 
 const FULL_DATE_FORMAT = 'DD MMMM YYYY';
 const SHORT_DATE_FORMAT = 'YYYY';
@@ -28,7 +28,7 @@ function humanizeCommentDate(date) {
   }
 }
 
-function reduceDescription(description, length = AMOUNT_SYMBOL) {
+function reduceDescription(description, length = DESCRIPTION_MAX_LENGTH) {
   if (description.length <= length) {
     return description;
   }

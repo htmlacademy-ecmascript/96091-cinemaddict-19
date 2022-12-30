@@ -1,14 +1,6 @@
 import {createElement} from '../render.js';
 import {humanizeReleaseDate, reduceDescription} from '../utils.js';
 
-function getCardClassName(isActive) {
-  return (
-    isActive
-      ? 'film-card__controls-item--active'
-      : ''
-  );
-}
-
 function creatCardTemplate(card) {
   const {comments, filmInfo, userDetails} = card;
   return `
@@ -26,9 +18,9 @@ function creatCardTemplate(card) {
       <span class="film-card__comments">${comments.length} comments</span>
     </a>
   <div class="film-card__controls">
-    <button class="film-card__controls-item ${getCardClassName(userDetails.isInWatchlist)} film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
-    <button class="film-card__controls-item ${getCardClassName(userDetails.isWatched)} film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>
-    <button class="film-card__controls-item ${getCardClassName(userDetails.isFavorite)} film-card__controls-item--favorite" type="button">Mark as favorite</button>
+    <button class="film-card__controls-item ${userDetails.isInWatchlist ? 'film-card__controls-item--active' : ''} film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
+    <button class="film-card__controls-item ${userDetails.isWatched ? 'film-card__controls-item--active' : ''} film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>
+    <button class="film-card__controls-item ${userDetails.isFavorite ? 'film-card__controls-item--active' : ''} film-card__controls-item--favorite" type="button">Mark as favorite</button>
   </div>
 </article>
   `;
@@ -36,7 +28,7 @@ function creatCardTemplate(card) {
 
 export default class CardView {
 
-  constructor({card}) {
+  constructor(card) {
     this.card = card;
   }
 

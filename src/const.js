@@ -1,10 +1,10 @@
-const PATH_EMOJI = {
+const EMOJI_IMAGES_SRC = {
   smile: './images/emoji/smile.png',
   sleeping: './images/emoji/sleeping.png',
   puke: './images/emoji/puke.png',
   angry: './images/emoji/angry.png'
 };
 
-const AMOUNT_SYMBOL = 140;
+const DESCRIPTION_MAX_LENGTH = 140;
 
-export {PATH_EMOJI, AMOUNT_SYMBOL};
+export {EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH};
