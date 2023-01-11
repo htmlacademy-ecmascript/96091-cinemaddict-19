@@ -1,11 +1,11 @@
 export default class AppModel {
-  cards = [];
+  #cards = [];
 
-  setCards(cards) {
-    this.cards = cards;
+  set cards(cards) {
+    this.#cards = cards;
   }
 
-  getCards() {
-    return this.cards;
+  get cards() {
+    return this.#cards;
   }
 }

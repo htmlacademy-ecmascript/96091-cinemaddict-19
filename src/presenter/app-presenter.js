@@ -13,35 +13,42 @@ import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 const CARDS_COUNT = 6;
 
 export default class AppPresenter {
+  #cards = null;
+  #pageMainElement = null;
+  #pageStatisticsElement = null;
+  #pageHeaderElement = null;
+  #appModel = null;
+  #mainComponent = null;
+  #cardDetailsPresenter = null;
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
-    this.pageMainElement = pageMainElement;
-    this.pageStatisticsElement = pageStatisticsElement;
-    this.pageHeaderElement = pageHeaderElement;
+    this.#pageMainElement = pageMainElement;
+    this.#pageStatisticsElement = pageStatisticsElement;
+    this.#pageHeaderElement = pageHeaderElement;
     const cards = Array.from({length: CARDS_COUNT}, getRandomCardWithComments);
-    this.appModel = new AppModel();
-    this.appModel.setCards(cards);
+    this.#appModel = new AppModel();
+    this.#appModel.cards = cards;
   }
 
   init() {
-    this.cards = [...this.appModel.getCards()];
-    this.mainComponent = new MainCardContainerView();
+    this.#cards = [...this.#appModel.cards];
+    this.#mainComponent = new MainCardContainerView();
 
-    this.cardDetailsPresenter = new CardDetailsPresenter(this.cards[0]);
-    this.cardDetailsPresenter.init();
+    this.#cardDetailsPresenter = new CardDetailsPresenter(this.#cards[0]);
+    this.#cardDetailsPresenter.init();
 
-    render(new UserView(), this.pageHeaderElement);
+    render(new UserView(), this.#pageHeaderElement);
 
-    render(new FilterView(), this.pageMainElement);
-    render(new SortView(), this.pageMainElement);
-    render(this.mainComponent, this.pageMainElement);
+    render(new FilterView(), this.#pageMainElement);
+    render(new SortView(), this.#pageMainElement);
+    render(this.#mainComponent, this.#pageMainElement);
 
-    for (let i = 1; i < this.cards.length; i++) {
-      render(new CardView(this.cards[i]), this.mainComponent.getFilmListContainer());
+    for (let i = 1; i < this.#cards.length; i++) {
+      render(new CardView(this.#cards[i]), this.#mainComponent.filmListContainer);
     }
 
-    render(new ShowMoreButtonView(), this.mainComponent.getFilmList());
+    render(new ShowMoreButtonView(), this.#mainComponent.filmList);
 
-    render(new StatisticView(), this.pageStatisticsElement);
+    render(new StatisticView(), this.#pageStatisticsElement);
   }
 }
