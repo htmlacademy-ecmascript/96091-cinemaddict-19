@@ -1,10 +1,8 @@
-import {getRandomArrayElement} from '../utils.js';
-
 const mockCards = [
   {
     id: '0',
     comments: [
-      '0', '5', '9', '12'
+      0, 5, 9, 12
     ],
     filmInfo: {
       title: 'Великий Фламарион',
@@ -39,7 +37,7 @@ const mockCards = [
   {
     id: '1',
     comments: [
-      '1', '6'
+      1, 6
     ],
     filmInfo: {
       title: 'Танец жизни',
@@ -74,7 +72,7 @@ const mockCards = [
   {
     id: '2',
     comments: [
-      '2', '7', '10', '13', '14'
+      2, 7, 10, 13, 14
     ],
     filmInfo: {
       title: 'Полынная тропа',
@@ -109,7 +107,7 @@ const mockCards = [
   {
     id: '3',
     comments: [
-      '3', '8', '11'
+      3, 8, 11
     ],
     filmInfo: {
       title: 'Человек c золотой рукой',
@@ -177,7 +175,7 @@ const mockCards = [
   {
     id: '5',
     'comments': [
-      '4'
+      4
     ],
     filmInfo: {
       title: 'Моряк Попай встречает моряка Синдбада',
@@ -208,11 +206,7 @@ const mockCards = [
       watchingDate: null,
       isFavorite: false
     }
-  },
+  }
 ];
 
-function getRandomMockCard() {
-  return getRandomArrayElement(mockCards);
-}
-
-export {getRandomMockCard};
+export {mockCards};

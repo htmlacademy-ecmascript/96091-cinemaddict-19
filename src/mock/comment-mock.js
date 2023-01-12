@@ -106,8 +106,4 @@ const mockComments = [
   },
 ];
 
-function getmockComments() {
-  return mockComments;
-}
-
-export {getmockComments};
+export {mockComments};

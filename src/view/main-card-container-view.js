@@ -12,27 +12,28 @@ function creatMainCardContainerTemplate() {
 }
 
 export default class MainCardContainerView {
+  #element = null;
 
-  getTemplate() {
+  get template() {
     return creatMainCardContainerTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
-  getFilmList() {
-    return this.element.querySelector('.films-list');
+  get filmList() {
+    return this.#element.querySelector('.films-list');
   }
 
-  getFilmListContainer() {
-    return this.element.querySelector('.films-list__container');
+  get filmListContainer() {
+    return this.#element.querySelector('.films-list__container');
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

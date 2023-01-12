@@ -1,22 +1,11 @@
-import {getRandomMockCard} from './card-mock.js';
-import {getmockComments} from './comment-mock.js';
+import {mockCards} from './card-mock.js';
+import {mockComments} from './comment-mock.js';
+import {getRandomArrayElement} from '../utils.js';
 
 function getRandomCardWithComments() {
-
-  const randomCard = getRandomMockCard();
-  const AllComments = getmockComments();
-
-
-  const commentsOnCard = AllComments.filter((comment) => {
-    const idCommentsOnCard = randomCard.comments;
-    return idCommentsOnCard.find((idCommentOnCard) => idCommentOnCard === comment.id);
-  });
-
-  for (let i = 0; i < commentsOnCard.length; i++) {
-    randomCard.comments[i] = commentsOnCard[i];
-  }
-
-  return randomCard;
+  const card = getRandomArrayElement(mockCards);
+  card.comments = card.comments.map((commentId) => mockComments[commentId]);
+  return card;
 }
 
 export {getRandomCardWithComments};
