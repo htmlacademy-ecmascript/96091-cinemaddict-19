@@ -9,8 +9,10 @@ import UserView from '../view/user-view.js';
 import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import CardDetailsView from '../view/card-details-view.js';
+import NoCardView from '../view/no-card-view.js';
 
-const CARDS_COUNT = 5;
+const CARDS_COUNT = 12;
+const CARDS_COUNT_PER_STEP = 5;
 
 export default class AppPresenter {
   #cards = null;
@@ -19,7 +21,8 @@ export default class AppPresenter {
   #pageHeaderElement = null;
   #appModel = null;
   #mainComponent = null;
-  #cardDetailsPresenter = null;
+  #showMoreButtonComponent = null;
+  #renderedCardCount = CARDS_COUNT_PER_STEP;
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -30,24 +33,53 @@ export default class AppPresenter {
     this.#appModel.cards = cards;
   }
 
+  #onClickshowMoreButton = (evt) => {
+    evt.preventDefault();
+    this.#cards
+      .slice(this.#renderedCardCount, this.#renderedCardCount + CARDS_COUNT_PER_STEP)
+      .forEach((card) => this.#renderCard(card));
+
+    this.#renderedCardCount += CARDS_COUNT_PER_STEP;
+
+    if (this.#renderedCardCount >= this.#cards.length) {
+      this.#showMoreButtonComponent.element.remove();
+      this.#showMoreButtonComponent.removeElement();
+    }
+  };
+
   init() {
     this.#cards = [...this.#appModel.cards];
+
+    this.#renderBoard();
+  }
+
+  #renderBoard() {
     this.#mainComponent = new MainCardContainerView();
 
     render(new UserView(), this.#pageHeaderElement);
 
     render(new FilterView(), this.#pageMainElement);
-    render(new SortView(), this.#pageMainElement);
-    render(this.#mainComponent, this.#pageMainElement);
 
-    for (let i = 0; i < this.#cards.length; i++) {
-      this.#renderCard(this.#cards[i]);
+    if (this.#cards.length === 0 || !this.#cards) {
+      render(new NoCardView, this.#pageMainElement);
+    } else {
+
+      render(new SortView(), this.#pageMainElement);
+      render(this.#mainComponent, this.#pageMainElement);
+
+      for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
+        this.#renderCard(this.#cards[i]);
+      }
+
+      if (this.#cards.length > CARDS_COUNT_PER_STEP) {
+        this.#showMoreButtonComponent = new ShowMoreButtonView();
+        render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
+
+        this.#showMoreButtonComponent.element.addEventListener('click', this.#onClickshowMoreButton);
+      }
     }
 
-    render(new ShowMoreButtonView(), this.#mainComponent.filmList);
-
-    render(new StatisticView(), this.#pageStatisticsElement);
-  }
+    render(new StatisticView(), this.#pageStatisticsElement);}
 
   #renderCard(card) {
     const cardComponent = new CardView(card);
@@ -82,7 +114,5 @@ export default class AppPresenter {
     });
 
     render(cardComponent, this.#mainComponent.filmListContainer);
-
-
   }
 }
