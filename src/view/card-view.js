@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeReleaseDate, reduceDescription} from '../utils.js';
 
 function creatCardTemplate(card) {
@@ -26,30 +26,19 @@ function creatCardTemplate(card) {
   `;
 }
 
-export default class CardView {
+export default class CardView extends AbstractView {
   #card = null;
-  #element = null;
+  #onCardLinkClick = null;
 
-  constructor(card) {
+  constructor(card, onCardLinkClick) {
+    super();
     this.#card = card;
+    this.#onCardLinkClick = onCardLinkClick;
+
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#onCardLinkClick);
   }
 
   get template() {
     return creatCardTemplate(this.#card);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
-
-  getCardLinkElement() {
-    return this.element.querySelector('.film-card__link');
   }
 }

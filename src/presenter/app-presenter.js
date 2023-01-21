@@ -1,4 +1,6 @@
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
+import AppModel from '../model/app-model.js';
+import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
@@ -6,8 +8,6 @@ import CardView from '../view/card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
-import AppModel from '../model/app-model.js';
-import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import CardDetailsView from '../view/card-details-view.js';
 import NoCardView from '../view/no-card-view.js';
 
@@ -74,10 +74,8 @@ export default class AppPresenter {
       }
 
       if (this.#cards.length > CARDS_COUNT_PER_STEP) {
-        this.#showMoreButtonComponent = new ShowMoreButtonView();
+        this.#showMoreButtonComponent = new ShowMoreButtonView(this.#onClickshowMoreButton);
         render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
-
-        this.#showMoreButtonComponent.element.addEventListener('click', this.#onClickshowMoreButton);
       }
     }
 
@@ -112,11 +110,8 @@ export default class AppPresenter {
   };
 
   #renderCard(card) {
-    this.#cardComponent = new CardView(card);
-    this.#cardComponent.getCardLinkElement().addEventListener('click', this.#onCardLinkClick);
-
-    this.#cardDetailsComponent = new CardDetailsView(card);
-    this.#cardDetailsComponent.getCloseButtonElement().addEventListener('click', this.#onCardDetailsCloseClick);
+    this.#cardComponent = new CardView(card, this.#onCardLinkClick);
+    this.#cardDetailsComponent = new CardDetailsView(card, this.#onCardDetailsCloseClick);
 
     render(this.#cardComponent, this.#mainComponent.filmListContainer);
   }

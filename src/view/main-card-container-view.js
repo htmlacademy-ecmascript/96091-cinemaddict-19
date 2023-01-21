@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function creatMainCardContainerTemplate() {
   return `
@@ -11,29 +11,17 @@ function creatMainCardContainerTemplate() {
   `;
 }
 
-export default class MainCardContainerView {
-  #element = null;
+export default class MainCardContainerView extends AbstractView {
 
   get template() {
     return creatMainCardContainerTemplate();
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
   get filmList() {
-    return this.#element.querySelector('.films-list');
+    return this.element.querySelector('.films-list');
   }
 
   get filmListContainer() {
-    return this.#element.querySelector('.films-list__container');
-  }
-
-  removeElement() {
-    this.#element = null;
+    return this.element.querySelector('.films-list__container');
   }
 }
