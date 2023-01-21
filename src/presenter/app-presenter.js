@@ -22,6 +22,8 @@ export default class AppPresenter {
   #appModel = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
+  #cardComponent = null;
+  #cardDetailsComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
@@ -50,10 +52,10 @@ export default class AppPresenter {
   init() {
     this.#cards = [...this.#appModel.cards];
 
-    this.#renderBoard();
+    this.#renderCards();
   }
 
-  #renderBoard() {
+  #renderCards() {
     this.#mainComponent = new MainCardContainerView();
 
     render(new UserView(), this.#pageHeaderElement);
@@ -79,40 +81,43 @@ export default class AppPresenter {
       }
     }
 
-    render(new StatisticView(), this.#pageStatisticsElement);}
+    render(new StatisticView(), this.#pageStatisticsElement);
+  }
+
+  #showCardDetails = () => {
+    document.body.classList.add('hide-overflow');
+    document.body.appendChild(this.#cardDetailsComponent.element);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #hideCardDetails = () => {
+    document.body.classList.remove('hide-overflow');
+    document.body.removeChild(this.#cardDetailsComponent.element);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#hideCardDetails();
+    }
+  };
+
+  #onCardLinkClick = () => {
+    this.#showCardDetails();
+  };
+
+  #onCardDetailsCloseClick = () => {
+    this.#hideCardDetails();
+  };
 
   #renderCard(card) {
-    const cardComponent = new CardView(card);
-    const cardDetailsComponent = new CardDetailsView(card);
+    this.#cardComponent = new CardView(card);
+    this.#cardComponent.getCardLinkElement().addEventListener('click', this.#onCardLinkClick);
 
-    const addCardDetails = () => {
-      document.body.classList.add('hide-overflow');
-      document.body.appendChild(cardDetailsComponent.element);
-    };
+    this.#cardDetailsComponent = new CardDetailsView(card);
+    this.#cardDetailsComponent.getCloseButtonElement().addEventListener('click', this.#onCardDetailsCloseClick);
 
-    const removeCardDetails = () => {
-      document.body.classList.remove('hide-overflow');
-      document.body.removeChild(cardDetailsComponent.element);
-    };
-
-    const onKeyDownEsc = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        removeCardDetails();
-        document.removeEventListener('keydown', onKeyDownEsc);
-      }
-    };
-
-    cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-      addCardDetails();
-      document.addEventListener('keydown', onKeyDownEsc);
-    });
-
-    cardDetailsComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-      removeCardDetails();
-      document.removeEventListener('keydown', onKeyDownEsc);
-    });
-
-    render(cardComponent, this.#mainComponent.filmListContainer);
+    render(this.#cardComponent, this.#mainComponent.filmListContainer);
   }
 }

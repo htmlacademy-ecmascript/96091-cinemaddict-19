@@ -48,4 +48,8 @@ export default class CardView {
   removeElement() {
     this.#element = null;
   }
+
+  getCardLinkElement() {
+    return this.element.querySelector('.film-card__link');
+  }
 }

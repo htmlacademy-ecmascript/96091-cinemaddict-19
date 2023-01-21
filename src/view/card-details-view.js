@@ -154,4 +154,8 @@ export default class CardDetailsView {
   removeElement() {
     this.#element = null;
   }
+
+  getCloseButtonElement() {
+    return this.element.querySelector('.film-details__close-btn');
+  }
 }
