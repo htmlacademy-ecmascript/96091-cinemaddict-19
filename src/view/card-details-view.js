@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeReleaseDate, humanizeCommentDate} from '../utils.js';
+import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card.js';
 import {EMOJI_IMAGES_SRC} from '../const.js';
 
 function creatCardDetailsTemplate(card) {

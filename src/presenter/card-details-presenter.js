@@ -1,4 +1,4 @@
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 import CardDetailsView from '../view/card-details-view.js';
 
 export default class CardDetailsPresenter {
