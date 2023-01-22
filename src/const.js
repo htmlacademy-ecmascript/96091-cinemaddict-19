@@ -7,4 +7,10 @@ const EMOJI_IMAGES_SRC = {
 
 const DESCRIPTION_MAX_LENGTH = 140;
 
-export {EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH};
+const FilterType = {
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+};
+
+export {EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH, FilterType};

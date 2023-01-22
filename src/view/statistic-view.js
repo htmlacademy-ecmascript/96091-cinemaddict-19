@@ -1,14 +1,20 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function creatStatisticTemplate() {
+function creatStatisticTemplate(cardsCount) {
   return `
-  <p>130 291 movies inside</p>
+  <p>${cardsCount} movies inside</p>
   `;
 }
 
 export default class StatisticView extends AbstractView {
+  #cardsCount = null;
+
+  constructor(cardsCount) {
+    super();
+    this.#cardsCount = cardsCount;
+  }
 
   get template() {
-    return creatStatisticTemplate();
+    return creatStatisticTemplate(this.#cardsCount);
   }
 }

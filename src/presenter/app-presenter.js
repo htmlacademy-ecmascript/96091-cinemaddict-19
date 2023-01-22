@@ -1,6 +1,7 @@
 import {render} from '../framework/render.js';
 import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
+import {generateFilter} from '../mock/filter-mock.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
@@ -25,6 +26,7 @@ export default class AppPresenter {
   #cardComponent = null;
   #cardDetailsComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
+  #filters = null;
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -60,7 +62,7 @@ export default class AppPresenter {
 
     render(new UserView(), this.#pageHeaderElement);
 
-    render(new FilterView(), this.#pageMainElement);
+    this.#renderFilter(this.#cards);
 
     if (this.#cards.length === 0 || !this.#cards) {
       render(new NoCardView, this.#pageMainElement);
@@ -79,7 +81,7 @@ export default class AppPresenter {
       }
     }
 
-    render(new StatisticView(), this.#pageStatisticsElement);
+    render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
   }
 
   #showCardDetails = () => {
@@ -114,5 +116,11 @@ export default class AppPresenter {
     this.#cardDetailsComponent = new CardDetailsView(card, this.#onCardDetailsCloseClick);
 
     render(this.#cardComponent, this.#mainComponent.filmListContainer);
+  }
+
+  #renderFilter(cards) {
+    this.#filters = generateFilter(cards);
+
+    render(new FilterView(this.#filters), this.#pageMainElement);
   }
 }
