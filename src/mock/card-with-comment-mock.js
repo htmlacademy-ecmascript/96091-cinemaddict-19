@@ -1,6 +1,6 @@
 import {mockCards} from './card-mock.js';
 import {mockComments} from './comment-mock.js';
-import {getRandomArrayElement} from '../utils/common.js';
+import {getRandomArrayElement} from '../utils/common-utils.js';
 
 function getRandomCardWithComments() {
   const card = Object.create(getRandomArrayElement(mockCards));

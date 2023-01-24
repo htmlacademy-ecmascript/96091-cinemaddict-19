@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeReleaseDate, reduceDescription} from '../utils/card.js';
+import {humanizeReleaseDate, reduceDescription} from '../utils/card-utils.js';
 
 function creatCardTemplate(card) {
   const {comments, filmInfo, userDetails} = card;
