@@ -1,4 +1,6 @@
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
+import AppModel from '../model/app-model.js';
+import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
@@ -6,8 +8,6 @@ import CardView from '../view/card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
-import AppModel from '../model/app-model.js';
-import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import CardDetailsView from '../view/card-details-view.js';
 import NoCardView from '../view/no-card-view.js';
 
@@ -22,6 +22,8 @@ export default class AppPresenter {
   #appModel = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
+  #cardComponent = null;
+  #cardDetailsComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
@@ -50,10 +52,10 @@ export default class AppPresenter {
   init() {
     this.#cards = [...this.#appModel.cards];
 
-    this.#renderBoard();
+    this.#renderCards();
   }
 
-  #renderBoard() {
+  #renderCards() {
     this.#mainComponent = new MainCardContainerView();
 
     render(new UserView(), this.#pageHeaderElement);
@@ -72,47 +74,45 @@ export default class AppPresenter {
       }
 
       if (this.#cards.length > CARDS_COUNT_PER_STEP) {
-        this.#showMoreButtonComponent = new ShowMoreButtonView();
+        this.#showMoreButtonComponent = new ShowMoreButtonView(this.#onClickshowMoreButton);
         render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
-
-        this.#showMoreButtonComponent.element.addEventListener('click', this.#onClickshowMoreButton);
       }
     }
 
-    render(new StatisticView(), this.#pageStatisticsElement);}
+    render(new StatisticView(), this.#pageStatisticsElement);
+  }
+
+  #showCardDetails = () => {
+    document.body.classList.add('hide-overflow');
+    document.body.appendChild(this.#cardDetailsComponent.element);
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #hideCardDetails = () => {
+    document.body.classList.remove('hide-overflow');
+    document.body.removeChild(this.#cardDetailsComponent.element);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.#hideCardDetails();
+    }
+  };
+
+  #onCardLinkClick = () => {
+    this.#showCardDetails();
+  };
+
+  #onCardDetailsCloseClick = () => {
+    this.#hideCardDetails();
+  };
 
   #renderCard(card) {
-    const cardComponent = new CardView(card);
-    const cardDetailsComponent = new CardDetailsView(card);
+    this.#cardComponent = new CardView(card, this.#onCardLinkClick);
+    this.#cardDetailsComponent = new CardDetailsView(card, this.#onCardDetailsCloseClick);
 
-    const addCardDetails = () => {
-      document.body.classList.add('hide-overflow');
-      document.body.appendChild(cardDetailsComponent.element);
-    };
-
-    const removeCardDetails = () => {
-      document.body.classList.remove('hide-overflow');
-      document.body.removeChild(cardDetailsComponent.element);
-    };
-
-    const onKeyDownEsc = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        removeCardDetails();
-        document.removeEventListener('keydown', onKeyDownEsc);
-      }
-    };
-
-    cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-      addCardDetails();
-      document.addEventListener('keydown', onKeyDownEsc);
-    });
-
-    cardDetailsComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-      removeCardDetails();
-      document.removeEventListener('keydown', onKeyDownEsc);
-    });
-
-    render(cardComponent, this.#mainComponent.filmListContainer);
+    render(this.#cardComponent, this.#mainComponent.filmListContainer);
   }
 }

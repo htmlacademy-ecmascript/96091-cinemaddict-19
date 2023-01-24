@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {DESCRIPTION_MAX_LENGTH} from './const.js';
+import {DESCRIPTION_MAX_LENGTH} from '../const.js';
 
 const FULL_DATE_FORMAT = 'DD MMMM YYYY';
 const SHORT_DATE_FORMAT = 'YYYY';
@@ -35,8 +35,4 @@ function reduceDescription(description, length = DESCRIPTION_MAX_LENGTH) {
   return `${description.slice(0, length - 1)}…`;
 }
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
-export {getRandomArrayElement, humanizeReleaseDate, reduceDescription, humanizeCommentDate};
+export {humanizeReleaseDate, reduceDescription, humanizeCommentDate};

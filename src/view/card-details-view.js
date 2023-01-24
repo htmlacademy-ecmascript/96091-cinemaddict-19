@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {humanizeReleaseDate, humanizeCommentDate} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card.js';
 import {EMOJI_IMAGES_SRC} from '../const.js';
 
 function creatCardDetailsTemplate(card) {
@@ -132,26 +132,19 @@ function creatCardDetailsTemplate(card) {
   `;
 }
 
-export default class CardDetailsView {
+export default class CardDetailsView extends AbstractView {
   #card = null;
-  #element = null;
+  #onCardDetailsCloseClick = null;
 
-  constructor(card) {
+  constructor(card, onCardDetailsCloseClick) {
+    super();
     this.#card = card;
+    this.#onCardDetailsCloseClick = onCardDetailsCloseClick;
+
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#onCardDetailsCloseClick);
   }
 
   get template() {
     return creatCardDetailsTemplate(this.#card);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
