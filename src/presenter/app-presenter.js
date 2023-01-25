@@ -37,7 +37,7 @@ export default class AppPresenter {
     this.#appModel.cards = cards;
   }
 
-  #onClickshowMoreButton = (evt) => {
+  #handleShowMoreButtonClick = (evt) => {
     evt.preventDefault();
     this.#cards
       .slice(this.#renderedCardCount, this.#renderedCardCount + CARDS_COUNT_PER_STEP)
@@ -76,7 +76,7 @@ export default class AppPresenter {
       }
 
       if (this.#cards.length > CARDS_COUNT_PER_STEP) {
-        this.#showMoreButtonComponent = new ShowMoreButtonView(this.#onClickshowMoreButton);
+        this.#showMoreButtonComponent = new ShowMoreButtonView(this.#handleShowMoreButtonClick);
         render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
       }
     }
@@ -84,37 +84,36 @@ export default class AppPresenter {
     render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
   }
 
-  #showCardDetails = () => {
+  #showCardDetails = (card) => {
+    this.#cardDetailsComponent = new CardDetailsView(card, this.#handleCardDetailsCloseClick);
     document.body.classList.add('hide-overflow');
     document.body.appendChild(this.#cardDetailsComponent.element);
-    document.addEventListener('keydown', this.#onEscKeyDown);
+    document.addEventListener('keydown', this.#handleEscKeyDown);
   };
 
   #hideCardDetails = () => {
     document.body.classList.remove('hide-overflow');
     document.body.removeChild(this.#cardDetailsComponent.element);
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    document.removeEventListener('keydown', this.#handleEscKeyDown);
   };
 
-  #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+  #handleEscKeyDown = (evt) => {
+    if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#hideCardDetails();
     }
   };
 
-  #onCardLinkClick = () => {
-    this.#showCardDetails();
+  #handleCardLinkClick = (card) => {
+    this.#showCardDetails(card);
   };
 
-  #onCardDetailsCloseClick = () => {
+  #handleCardDetailsCloseClick = () => {
     this.#hideCardDetails();
   };
 
   #renderCard(card) {
-    this.#cardComponent = new CardView(card, this.#onCardLinkClick);
-    this.#cardDetailsComponent = new CardDetailsView(card, this.#onCardDetailsCloseClick);
-
+    this.#cardComponent = new CardView(card, this.#handleCardLinkClick);
     render(this.#cardComponent, this.#mainComponent.filmListContainer);
   }
 

@@ -35,8 +35,12 @@ export default class CardView extends AbstractView {
     this.#card = card;
     this.#onCardLinkClick = onCardLinkClick;
 
-    this.element.querySelector('.film-card__link').addEventListener('click', this.#onCardLinkClick);
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#handleCardLinkClick);
   }
+
+  #handleCardLinkClick = () => {
+    this.#onCardLinkClick(this.#card);
+  };
 
   get template() {
     return creatCardTemplate(this.#card);
