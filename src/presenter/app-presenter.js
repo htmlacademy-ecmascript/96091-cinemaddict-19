@@ -1,4 +1,4 @@
-import {render} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import {generateFilter} from '../mock/filter-mock.js';
@@ -25,6 +25,7 @@ export default class AppPresenter {
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #filters = null;
   #cardPresenter = null;
+  #cardPresenterMap = new Map();
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -85,6 +86,14 @@ export default class AppPresenter {
   #renderCard(card) {
     this.#cardPresenter = new CardPresenter(this.#mainComponent);
     this.#cardPresenter.init(card);
+    this.#cardPresenterMap.set(card.id, this.#cardPresenter);
+  }
+
+  #clearCards() {
+    this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
+    this.#cardPresenterMap.clear();
+    this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    remove(this.#showMoreButtonComponent);
   }
 
   #renderFilter(cards) {
