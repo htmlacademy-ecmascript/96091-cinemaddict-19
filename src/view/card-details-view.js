@@ -134,15 +134,51 @@ function creatCardDetailsTemplate(card) {
 
 export default class CardDetailsView extends AbstractView {
   #card = null;
-  #onCardDetailsCloseClick = null;
+  #handleCardDetailsCloseClick = null;
+  #handleWatchlistClick = null;
+  #handleWatchedClick = null;
+  #handleFavoriteClick = null;
 
-  constructor(card, onCardDetailsCloseClick) {
+  constructor(
+    card,
+    onCardDetailsCloseClick,
+    onWatchlistClick,
+    onWatchedClick,
+    onFavoriteClick
+  ) {
     super();
     this.#card = card;
-    this.#onCardDetailsCloseClick = onCardDetailsCloseClick;
+    this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
+    this.#handleWatchlistClick = onWatchlistClick;
+    this.#handleWatchedClick = onWatchedClick;
+    this.#handleFavoriteClick = onFavoriteClick;
 
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#onCardDetailsCloseClick);
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#cardDetailsCloseClickHandler);
+
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   }
+
+  #cardDetailsCloseClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCardDetailsCloseClick();
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleWatchlistClick();
+  };
+
+  #watchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleWatchedClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
 
   get template() {
     return creatCardDetailsTemplate(this.#card);

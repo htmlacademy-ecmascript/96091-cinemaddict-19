@@ -1,16 +1,16 @@
-import {render} from '../framework/render.js';
+import {render, remove} from '../framework/render.js';
 import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import {generateFilter} from '../mock/filter-mock.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
-import CardView from '../view/card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
-import CardDetailsView from '../view/card-details-view.js';
 import NoCardView from '../view/no-card-view.js';
+import CardPresenter from './card-presenter.js';
+import {updateItem} from '../utils/common-utils.js';
 
 const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
@@ -23,10 +23,10 @@ export default class AppPresenter {
   #appModel = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
-  #cardComponent = null;
-  #cardDetailsComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #filters = null;
+  #cardPresenter = null;
+  #cardPresenterMap = new Map();
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -37,7 +37,7 @@ export default class AppPresenter {
     this.#appModel.cards = cards;
   }
 
-  #onClickshowMoreButton = (evt) => {
+  #handleShowMoreButtonClick = (evt) => {
     evt.preventDefault();
     this.#cards
       .slice(this.#renderedCardCount, this.#renderedCardCount + CARDS_COUNT_PER_STEP)
@@ -57,6 +57,25 @@ export default class AppPresenter {
     this.#renderCards();
   }
 
+  #handleCardChange = (updatedCard) => {
+    this.#cards = updateItem(this.#cards, updatedCard);
+    this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  };
+
+  #handleHideCardDetails = () => {
+    this.#cardPresenterMap.forEach((presenter) => presenter.resetCardDetailsView());
+  };
+
+  #renderCard(card) {
+    this.#cardPresenter = new CardPresenter(
+      this.#mainComponent,
+      this.#handleCardChange,
+      this.#handleHideCardDetails
+    );
+    this.#cardPresenter.init(card);
+    this.#cardPresenterMap.set(card.id, this.#cardPresenter);
+  }
+
   #renderCards() {
     this.#mainComponent = new MainCardContainerView();
 
@@ -66,56 +85,30 @@ export default class AppPresenter {
 
     if (this.#cards.length === 0 || !this.#cards) {
       render(new NoCardView, this.#pageMainElement);
-    } else {
+      return;
+    }
 
-      render(new SortView(), this.#pageMainElement);
-      render(this.#mainComponent, this.#pageMainElement);
+    render(new SortView(), this.#pageMainElement);
+    render(this.#mainComponent, this.#pageMainElement);
 
-      for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
-        this.#renderCard(this.#cards[i]);
-      }
+    for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
+      this.#renderCard(this.#cards[i]);
+    }
 
-      if (this.#cards.length > CARDS_COUNT_PER_STEP) {
-        this.#showMoreButtonComponent = new ShowMoreButtonView(this.#onClickshowMoreButton);
-        render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
-      }
+    if (this.#cards.length > CARDS_COUNT_PER_STEP) {
+      this.#showMoreButtonComponent = new ShowMoreButtonView(this.#handleShowMoreButtonClick);
+      render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
     }
 
     render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
   }
 
-  #showCardDetails = () => {
-    document.body.classList.add('hide-overflow');
-    document.body.appendChild(this.#cardDetailsComponent.element);
-    document.addEventListener('keydown', this.#onEscKeyDown);
-  };
 
-  #hideCardDetails = () => {
-    document.body.classList.remove('hide-overflow');
-    document.body.removeChild(this.#cardDetailsComponent.element);
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.#hideCardDetails();
-    }
-  };
-
-  #onCardLinkClick = () => {
-    this.#showCardDetails();
-  };
-
-  #onCardDetailsCloseClick = () => {
-    this.#hideCardDetails();
-  };
-
-  #renderCard(card) {
-    this.#cardComponent = new CardView(card, this.#onCardLinkClick);
-    this.#cardDetailsComponent = new CardDetailsView(card, this.#onCardDetailsCloseClick);
-
-    render(this.#cardComponent, this.#mainComponent.filmListContainer);
+  #clearCards() {
+    this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
+    this.#cardPresenterMap.clear();
+    this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    remove(this.#showMoreButtonComponent);
   }
 
   #renderFilter(cards) {
