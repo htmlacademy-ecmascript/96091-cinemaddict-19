@@ -10,6 +10,7 @@ import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
+import {updateItem} from '../utils/common-utils.js';
 
 const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
@@ -56,6 +57,17 @@ export default class AppPresenter {
     this.#renderCards();
   }
 
+  #handleCardChange = (updatedCard) => {
+    this.#cards = updateItem(this.#cards, updatedCard);
+    this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  };
+
+  #renderCard(card) {
+    this.#cardPresenter = new CardPresenter(this.#mainComponent, this.#handleCardChange);
+    this.#cardPresenter.init(card);
+    this.#cardPresenterMap.set(card.id, this.#cardPresenter);
+  }
+
   #renderCards() {
     this.#mainComponent = new MainCardContainerView();
 
@@ -83,11 +95,6 @@ export default class AppPresenter {
     render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
   }
 
-  #renderCard(card) {
-    this.#cardPresenter = new CardPresenter(this.#mainComponent);
-    this.#cardPresenter.init(card);
-    this.#cardPresenterMap.set(card.id, this.#cardPresenter);
-  }
 
   #clearCards() {
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
