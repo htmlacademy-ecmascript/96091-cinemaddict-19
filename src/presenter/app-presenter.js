@@ -62,8 +62,16 @@ export default class AppPresenter {
     this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
   };
 
+  #handleHideCardDetails = () => {
+    this.#cardPresenterMap.forEach((presenter) => presenter.resetCardDetailsView());
+  };
+
   #renderCard(card) {
-    this.#cardPresenter = new CardPresenter(this.#mainComponent, this.#handleCardChange);
+    this.#cardPresenter = new CardPresenter(
+      this.#mainComponent,
+      this.#handleCardChange,
+      this.#handleHideCardDetails
+    );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
   }

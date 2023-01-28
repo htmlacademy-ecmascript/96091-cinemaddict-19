@@ -8,22 +8,32 @@ export default class CardPresenter {
   #cardComponent = null;
   #cardDetailsComponent = null;
   #handleDataChange = null;
+  #isCardDetailsShow = false;
+  #handleHideCardDetails = null;
 
-  constructor(cardContainer, onCardChange) {
+  constructor(
+    cardContainer,
+    onCardChange,
+    onHideCardDetails
+  ) {
     this.#mainComponent = cardContainer;
     this.#handleDataChange = onCardChange;
+    this.#handleHideCardDetails = onHideCardDetails;
   }
 
   #showCardDetails = () => {
     document.body.classList.add('hide-overflow');
     document.body.appendChild(this.#cardDetailsComponent.element);
     document.addEventListener('keydown', this.#handleEscKeyDown);
+    this.#handleHideCardDetails();
+    this.#isCardDetailsShow = true;
   };
 
   #hideCardDetails = () => {
     document.body.classList.remove('hide-overflow');
     document.body.removeChild(this.#cardDetailsComponent.element);
     document.removeEventListener('keydown', this.#handleEscKeyDown);
+    this.#isCardDetailsShow = false;
   };
 
   #handleEscKeyDown = (evt) => {
@@ -96,5 +106,11 @@ export default class CardPresenter {
 
   destroy() {
     remove(this.#cardComponent);
+  }
+
+  resetCardDetailsView() {
+    if (this.#isCardDetailsShow) {
+      this.#hideCardDetails();
+    }
   }
 }
