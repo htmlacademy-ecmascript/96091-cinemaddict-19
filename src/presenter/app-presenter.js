@@ -23,6 +23,7 @@ export default class AppPresenter {
   #appModel = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
+  #sortComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #filters = null;
   #cardPresenter = null;
@@ -88,7 +89,8 @@ export default class AppPresenter {
       return;
     }
 
-    render(new SortView(), this.#pageMainElement);
+    this.#renderSort();
+
     render(this.#mainComponent, this.#pageMainElement);
 
     for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
@@ -115,5 +117,17 @@ export default class AppPresenter {
     this.#filters = generateFilter(cards);
 
     render(new FilterView(this.#filters), this.#pageMainElement);
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    // - Сортируем задачи
+    // - Очищаем список
+    // - Рендерим список заново
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView(this.#handleSortTypeChange);
+
+    render(this.#sortComponent, this.#pageMainElement);
   }
 }
