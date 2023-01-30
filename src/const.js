@@ -13,4 +13,10 @@ const FilterType = {
   FAVORITES: 'favorites',
 };
 
-export {EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH, FilterType};
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
+export {EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH, FilterType, SortType};

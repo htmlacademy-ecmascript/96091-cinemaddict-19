@@ -11,6 +11,8 @@ import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
 import CardPresenter from './card-presenter.js';
 import {updateItem} from '../utils/common-utils.js';
+import {SortType} from '../const.js';
+import {sortByDate, sortByRating} from '../utils/sort-utils.js';
 
 const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
@@ -23,10 +25,13 @@ export default class AppPresenter {
   #appModel = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
+  #sortComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #filters = null;
   #cardPresenter = null;
   #cardPresenterMap = new Map();
+  #currentSortType = SortType.DEFAULT;
+  #sourcedCards = [];
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -53,12 +58,15 @@ export default class AppPresenter {
 
   init() {
     this.#cards = [...this.#appModel.cards];
+    this.#sourcedCards = [...this.#appModel.cards];
 
     this.#renderCards();
   }
 
   #handleCardChange = (updatedCard) => {
     this.#cards = updateItem(this.#cards, updatedCard);
+    this.#sourcedCards = updateItem(this.#cards, updatedCard);
+
     this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
   };
 
@@ -77,10 +85,7 @@ export default class AppPresenter {
   }
 
   #renderCards() {
-    this.#mainComponent = new MainCardContainerView();
-
     render(new UserView(), this.#pageHeaderElement);
-
     this.#renderFilter(this.#cards);
 
     if (this.#cards.length === 0 || !this.#cards) {
@@ -88,7 +93,59 @@ export default class AppPresenter {
       return;
     }
 
-    render(new SortView(), this.#pageMainElement);
+    this.#renderSort();
+    this.#renderCardsList();
+    render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
+  }
+
+  #renderFilter(cards) {
+    this.#filters = generateFilter(cards);
+
+    render(new FilterView(this.#filters), this.#pageMainElement);
+  }
+
+  #sortCards(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#cards.sort(sortByDate);
+        break;
+      case SortType.RATING:
+        this.#cards.sort(sortByRating);
+        break;
+      default:
+        this.#cards = [...this.#sourcedCards];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortCards(sortType);
+    this.#clearCards();
+    this.#renderCardsList();
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView(this.#handleSortTypeChange);
+
+    render(this.#sortComponent, this.#pageMainElement);
+  }
+
+  #clearCards() {
+    this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
+    this.#cardPresenterMap.clear();
+    this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    remove(this.#mainComponent);
+    remove(this.#showMoreButtonComponent);
+  }
+
+  #renderCardsList() {
+    this.#mainComponent = new MainCardContainerView();
+
     render(this.#mainComponent, this.#pageMainElement);
 
     for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
@@ -99,21 +156,5 @@ export default class AppPresenter {
       this.#showMoreButtonComponent = new ShowMoreButtonView(this.#handleShowMoreButtonClick);
       render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
     }
-
-    render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
-  }
-
-
-  #clearCards() {
-    this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
-    this.#cardPresenterMap.clear();
-    this.#renderedCardCount = CARDS_COUNT_PER_STEP;
-    remove(this.#showMoreButtonComponent);
-  }
-
-  #renderFilter(cards) {
-    this.#filters = generateFilter(cards);
-
-    render(new FilterView(this.#filters), this.#pageMainElement);
   }
 }
