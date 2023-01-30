@@ -125,8 +125,8 @@ export default class AppPresenter {
     }
 
     this.#sortCards(sortType);
-    // - Очищаем список
-    // - Рендерим список заново
+    this.#clearCards();
+    this.#renderCardsList();
   };
 
   #renderSort() {
