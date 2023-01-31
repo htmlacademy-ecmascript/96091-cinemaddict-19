@@ -160,6 +160,10 @@ export default class CardDetailsView extends AbstractView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   }
 
+  get template() {
+    return creatCardDetailsTemplate(this.#card);
+  }
+
   #cardDetailsCloseClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleCardDetailsCloseClick();
@@ -179,8 +183,4 @@ export default class CardDetailsView extends AbstractView {
     evt.preventDefault();
     this.#handleFavoriteClick();
   };
-
-  get template() {
-    return creatCardDetailsTemplate(this.#card);
-  }
 }

@@ -16,11 +16,12 @@ export default class ShowMoreButtonView extends AbstractView {
     this.element.addEventListener('click', this.#showMoreButtonClickHandler);
   }
 
-  #showMoreButtonClickHandler = () => {
-    this.#handleShowMoreButtonClick();
-  };
-
   get template() {
     return creatShowMoreButtonTemplate();
   }
+
+  #showMoreButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleShowMoreButtonClick();
+  };
 }
