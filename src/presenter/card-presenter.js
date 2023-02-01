@@ -1,48 +1,39 @@
 import {render, replace, remove} from '../framework/render.js';
 import CardView from '../view/card-view.js';
-// import CardDetailsView from '../view/card-details-view.js';
+import CardDetailsPresenter from './card-details-presenter.js';
 
 export default class CardPresenter {
   #mainComponent = null;
   #card = null;
   #cardComponent = null;
-  // #cardDetailsComponent = null;
+  #cardDetailsPresenter = null;
   #handleDataChange = null;
-  // #isCardDetailsShow = false;
-  // #handleHideCardDetails = null;
+  #isCardDetailsShow = false;
+  #resetCardsDetails = null;
 
   constructor(
     cardContainer,
-    onCardChange,
-    // onHideCardDetails
+    resetCardsDetails,
+    onCardChange
   ) {
     this.#mainComponent = cardContainer;
+    this.#resetCardsDetails = resetCardsDetails;
     this.#handleDataChange = onCardChange;
-    // this.#handleHideCardDetails = onHideCardDetails;
   }
 
   init(card) {
     this.#card = card;
     const prevCardComponent = this.#cardComponent;
-    // const prevCardDetailsComponent = this.#cardDetailsComponent;
 
     this.#cardComponent = new CardView(
       this.#card,
-      // this.#handleCardLinkClick,
       this.#handleWatchlistClick,
       this.#handleWatchedClick,
-      this.#handleFavoriteClick
+      this.#handleFavoriteClick,
+      this.#handleCardLinkClick
     );
 
-    // this.#cardDetailsComponent = new CardDetailsView(
-    //   this.#card,
-    //   this.#handleCardDetailsCloseClick,
-    //   this.#handleWatchlistClick,
-    //   this.#handleWatchedClick,
-    //   this.#handleFavoriteClick
-    // );
-
-    if (prevCardComponent === null) { //  || prevCardDetailsComponent === null
+    if (prevCardComponent === null) {
       render(this.#cardComponent, this.#mainComponent.filmListContainer);
       return;
     }
@@ -51,16 +42,41 @@ export default class CardPresenter {
       replace(this.#cardComponent, prevCardComponent);
     }
 
-    // if (document.body.contains(prevCardDetailsComponent.element)) {
-    //   replace(this.#cardDetailsComponent, prevCardDetailsComponent);
-    // }
+    if (this.#cardDetailsPresenter !== null) {
+      this.#cardDetailsPresenter.init(card);
+    }
 
     remove(prevCardComponent);
-    // remove(prevCardDetailsComponent);
   }
 
   destroy() {
     remove(this.#cardComponent);
+  }
+
+  #showCardDetails(card) {
+    this.#cardDetailsPresenter = new CardDetailsPresenter(
+      this.#handleCardDetailsCloseClick,
+      this.#handleWatchlistClick,
+      this.#handleWatchedClick,
+      this.#handleFavoriteClick
+    );
+    this.#cardDetailsPresenter.init(card);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#isCardDetailsShow = true;
+  }
+
+  #hideCardDetails() {
+    document.body.classList.remove('hide-overflow');
+    this.#cardDetailsPresenter.destroy();
+    this.#cardDetailsPresenter = null;
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#isCardDetailsShow = false;
+  }
+
+  resetCardDetails() {
+    if (this.#isCardDetailsShow) {
+      this.#hideCardDetails();
+    }
   }
 
   #handleWatchlistClick = () => {
@@ -78,39 +94,19 @@ export default class CardPresenter {
     this.#handleDataChange(this.#card);
   };
 
-  // resetCardDetailsView() {
-  //   if (this.#isCardDetailsShow) {
-  //     this.#hideCardDetails();
-  //   }
-  // }
+  #handleCardLinkClick = (card) => {
+    this.#resetCardsDetails();
+    this.#showCardDetails(card);
+  };
 
-  // #showCardDetails = () => {
-  //   document.body.classList.add('hide-overflow');
-  //   document.body.appendChild(this.#cardDetailsComponent.element);
-  //   document.addEventListener('keydown', this.#handleEscKeyDown);
-  //   this.#handleHideCardDetails();
-  //   this.#isCardDetailsShow = true;
-  // };
+  #handleCardDetailsCloseClick = () => {
+    this.#hideCardDetails();
+  };
 
-  // #hideCardDetails = () => {
-  //   document.body.classList.remove('hide-overflow');
-  //   document.body.removeChild(this.#cardDetailsComponent.element);
-  //   document.removeEventListener('keydown', this.#handleEscKeyDown);
-  //   this.#isCardDetailsShow = false;
-  // };
-
-  // #handleEscKeyDown = (evt) => {
-  //   if (evt.key === 'Escape') {
-  //     evt.preventDefault();
-  //     this.#hideCardDetails();
-  //   }
-  // };
-
-  // #handleCardLinkClick = (card) => {
-  //   this.#showCardDetails(card);
-  // };
-
-  // #handleCardDetailsCloseClick = () => {
-  //   this.#hideCardDetails();
-  // };
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#hideCardDetails();
+    }
+  };
 }

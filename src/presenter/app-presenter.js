@@ -3,7 +3,6 @@ import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import {generateFilter} from '../mock/filter-mock.js';
 import CardPresenter from './card-presenter.js';
-// import CardDetailsPresenter from './card-details-presenter.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
@@ -30,7 +29,6 @@ export default class AppPresenter {
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #filters = null;
   #cardPresenter = null;
-  // #cardDetailsPresenter = null;
   #cardPresenterMap = new Map();
   #currentSortType = SortType.DEFAULT;
   #sourcedCards = [];
@@ -95,9 +93,8 @@ export default class AppPresenter {
   #renderCard(card) {
     this.#cardPresenter = new CardPresenter(
       this.#mainComponent,
-      this.#handleCardChange,
-      // this.#handleHideCardDetails,
-      // this.#handleRenderCardDetails
+      this.#resetCardsDetails,
+      this.#handleCardChange
     );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
@@ -125,6 +122,10 @@ export default class AppPresenter {
     remove(this.#mainComponent);
     remove(this.#showMoreButtonComponent);
   }
+
+  #resetCardsDetails = () => {
+    this.#cardPresenterMap.forEach((presenter) => presenter.resetCardDetails());
+  };
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -155,12 +156,4 @@ export default class AppPresenter {
       this.#showMoreButtonComponent.removeElement();
     }
   };
-
-  // #handleHideCardDetails = () => {
-  //   this.#cardPresenterMap.forEach((presenter) => presenter.resetCardDetailsView());
-  // };
-
-  // #handleRenderCardDetails = (card) => {
-  //   this.#cardDetailsPresenter = new CardDetailsPresenter(card);
-  // };
 }
