@@ -4,7 +4,7 @@ import {getRandomArrayElement} from '../utils/common-utils.js';
 import {nanoid} from 'nanoid';
 
 function getRandomCardWithComments() {
-  const card = Object.create(getRandomArrayElement(mockCards));
+  const card = structuredClone(getRandomArrayElement(mockCards));
   card.comments = card.comments.map((commentId) => mockComments[commentId]);
   card.id = nanoid();
   return card;

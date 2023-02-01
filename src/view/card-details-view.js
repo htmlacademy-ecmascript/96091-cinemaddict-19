@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card-utils.js';
 import {EMOJI_IMAGES_SRC} from '../const.js';
 
@@ -132,8 +132,7 @@ function creatCardDetailsTemplate(card) {
   `;
 }
 
-export default class CardDetailsView extends AbstractView {
-  #card = null;
+export default class CardDetailsView extends AbstractStatefulView {
   #handleCardDetailsCloseClick = null;
   #handleWatchlistClick = null;
   #handleWatchedClick = null;
@@ -147,7 +146,7 @@ export default class CardDetailsView extends AbstractView {
     onFavoriteClick
   ) {
     super();
-    this.#card = card;
+    this._setState(CardDetailsView.parseCardToState(card));
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
@@ -161,7 +160,7 @@ export default class CardDetailsView extends AbstractView {
   }
 
   get template() {
-    return creatCardDetailsTemplate(this.#card);
+    return creatCardDetailsTemplate(this._state);
   }
 
   #cardDetailsCloseClickHandler = (evt) => {
@@ -183,4 +182,13 @@ export default class CardDetailsView extends AbstractView {
     evt.preventDefault();
     this.#handleFavoriteClick();
   };
+
+  static parseCardToState(card){
+    return {...card};
+  }
+
+  static parseStateToCard(state){
+    const card = {state};
+    return card;
+  }
 }
