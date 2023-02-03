@@ -1,9 +1,9 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card-utils.js';
-import {EMOJI_IMAGES_SRC} from '../const.js';
+import {X_COORD, EMOJI_IMAGES_SRC} from '../const.js';
 
 function creatCardDetailsTemplate(card) {
-  const {comments, filmInfo, userDetails} = card;
+  const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked} = card;
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -97,32 +97,19 @@ function creatCardDetailsTemplate(card) {
           </ul>
 
           <form class="film-details__new-comment" action="" method="get">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">${isEmojiChecked ? emojiTemplate : ''}</div>
 
             <label class="film-details__comment-label">
               <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-              <label class="film-details__emoji-label" for="emoji-smile">
-                <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
+              ${emojis.map((emoji) => (`
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}">
+              <label class="film-details__emoji-label" for="emoji-${emoji}">
+                <img src="./images/emoji/${emoji}.png" width="30" height="30" alt="emoji">
               </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-              <label class="film-details__emoji-label" for="emoji-sleeping">
-                <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-              <label class="film-details__emoji-label" for="emoji-puke">
-                <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-              </label>
-
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-              <label class="film-details__emoji-label" for="emoji-angry">
-                <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-              </label>
+              `)).join('')}
             </div>
           </form>
         </section>
@@ -132,8 +119,7 @@ function creatCardDetailsTemplate(card) {
   `;
 }
 
-export default class CardDetailsView extends AbstractView {
-  #card = null;
+export default class CardDetailsView extends AbstractStatefulView {
   #handleCardDetailsCloseClick = null;
   #handleWatchlistClick = null;
   #handleWatchedClick = null;
@@ -147,17 +133,27 @@ export default class CardDetailsView extends AbstractView {
     onFavoriteClick
   ) {
     super();
-    this.#card = card;
+    this._setState(CardDetailsView.parseCardToState(card));
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
+    this._restoreHandlers();
+  }
+
+  get template() {
+    return creatCardDetailsTemplate(this._state);
+  }
+
+  _restoreHandlers() {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#cardDetailsCloseClickHandler);
 
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
     this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
+
+    this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiListClickHandler);
   }
 
   #cardDetailsCloseClickHandler = (evt) => {
@@ -180,7 +176,43 @@ export default class CardDetailsView extends AbstractView {
     this.#handleFavoriteClick();
   };
 
-  get template() {
-    return creatCardDetailsTemplate(this.#card);
+  #emojiListClickHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+
+    this.updateElement({
+      emojiTemplate: `<img src="./images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-smile">`,
+      isEmojiChecked: true,
+      scrollPosition: this.element.scrollTop
+    });
+
+    this.element.scrollTo(X_COORD, this._state.scrollPosition);
+
+    this.element.querySelectorAll('.film-details__emoji-item').forEach(
+      (element) => {
+        if (element.value === evt.target.value) {
+          element.setAttribute('checked','');
+        }
+      }
+    );
+  };
+
+  static parseCardToState(card){
+    return {
+      ...card,
+      emojis: ['smile', 'sleeping', 'puke', 'angry'],
+      emojiTemplate: null,
+      isEmojiChecked: false
+    };
+  }
+
+  static parseStateToCard(state){
+    const card = {state};
+
+    delete card.emojis;
+    delete card.emojiTemplate;
+    delete card.isEmojiChecked;
+    return card;
   }
 }

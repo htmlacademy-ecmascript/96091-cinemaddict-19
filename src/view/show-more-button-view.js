@@ -7,16 +7,21 @@ function creatShowMoreButtonTemplate() {
 }
 
 export default class ShowMoreButtonView extends AbstractView {
-  #onShowMoreButtonClick = null;
+  #handleShowMoreButtonClick = null;
 
   constructor(onShowMoreButtonClick) {
     super();
-    this.#onShowMoreButtonClick = onShowMoreButtonClick;
+    this.#handleShowMoreButtonClick = onShowMoreButtonClick;
 
-    this.element.addEventListener('click', this.#onShowMoreButtonClick);
+    this.element.addEventListener('click', this.#showMoreButtonClickHandler);
   }
 
   get template() {
     return creatShowMoreButtonTemplate();
   }
+
+  #showMoreButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleShowMoreButtonClick();
+  };
 }
