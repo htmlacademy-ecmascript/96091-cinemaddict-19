@@ -10,7 +10,6 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
-import {updateItem} from '../utils/common-utils.js';
 import {SortType} from '../const.js';
 import {sortByDate, sortByRating} from '../utils/sort-utils.js';
 
@@ -31,7 +30,6 @@ export default class AppPresenter {
   #cardPresenter = null;
   #cardPresenterMap = new Map();
   #currentSortType = SortType.DEFAULT;
-  #sourcedCards = [];
 
   constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
     this.#pageMainElement = pageMainElement;
@@ -43,28 +41,31 @@ export default class AppPresenter {
   }
 
   get cards() {
+    switch (this.#currentSortType) {
+      case SortType.DATE:
+        return [...this.#appModel.cards].sort(sortByDate);
+      case SortType.RATING:
+        return [...this.#appModel.cards].sort(sortByRating);
+    }
     return this.#appModel.cards;
   }
 
   init() {
-    this.#cards = [...this.#appModel.cards];
-    this.#sourcedCards = [...this.#appModel.cards];
-
     this.#renderCards();
   }
 
   #renderCards() {
     render(new UserView(), this.#pageHeaderElement);
-    this.#renderFilter(this.#cards);
+    this.#renderFilter(this.cards);
 
-    if (this.#cards.length === 0 || !this.#cards) {
+    if (this.cards.length === 0 || !this.cards) {
       render(new NoCardView, this.#pageMainElement);
       return;
     }
 
     this.#renderSort();
     this.#renderCardsList();
-    render(new StatisticView(this.#cards.length), this.#pageStatisticsElement);
+    render(new StatisticView(this.cards.length), this.#pageStatisticsElement);
   }
 
   #renderFilter(cards) {
@@ -84,11 +85,11 @@ export default class AppPresenter {
 
     render(this.#mainComponent, this.#pageMainElement);
 
-    for (let i = 0; i < Math.min(this.#cards.length, CARDS_COUNT_PER_STEP); i++) {
-      this.#renderCard(this.#cards[i]);
+    for (let i = 0; i < Math.min(this.cards.length, CARDS_COUNT_PER_STEP); i++) {
+      this.#renderCard(this.cards[i]);
     }
 
-    if (this.#cards.length > CARDS_COUNT_PER_STEP) {
+    if (this.cards.length > CARDS_COUNT_PER_STEP) {
       this.#showMoreButtonComponent = new ShowMoreButtonView(this.#handleShowMoreButtonClick);
       render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
     }
@@ -102,21 +103,6 @@ export default class AppPresenter {
     );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
-  }
-
-  #sortCards(sortType) {
-    switch (sortType) {
-      case SortType.DATE:
-        this.#cards.sort(sortByDate);
-        break;
-      case SortType.RATING:
-        this.#cards.sort(sortByRating);
-        break;
-      default:
-        this.#cards = [...this.#sourcedCards];
-    }
-
-    this.#currentSortType = sortType;
   }
 
   #clearCards() {
@@ -136,26 +122,25 @@ export default class AppPresenter {
       return;
     }
 
-    this.#sortCards(sortType);
+    this.#currentSortType = sortType;
     this.#clearCards();
     this.#renderCardsList();
   };
 
   #handleCardChange = (updatedCard) => {
-    this.#cards = updateItem(this.#cards, updatedCard);
-    this.#sourcedCards = updateItem(this.#cards, updatedCard);
+    // Здесь будем вызывать обновление модели
 
     this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
   };
 
   #handleShowMoreButtonClick = () => {
-    this.#cards
+    this.cards
       .slice(this.#renderedCardCount, this.#renderedCardCount + CARDS_COUNT_PER_STEP)
       .forEach((card) => this.#renderCard(card));
 
     this.#renderedCardCount += CARDS_COUNT_PER_STEP;
 
-    if (this.#renderedCardCount >= this.#cards.length) {
+    if (this.#renderedCardCount >= this.cards.length) {
       this.#showMoreButtonComponent.element.remove();
       this.#showMoreButtonComponent.removeElement();
     }
