@@ -1,4 +1,6 @@
-export default class AppModel {
+import Observable from '../framework/observable.js';
+
+export default class AppModel extends Observable {
   #cards = [];
 
   set cards(cards) {

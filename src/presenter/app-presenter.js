@@ -42,6 +42,10 @@ export default class AppPresenter {
     this.#appModel.cards = cards;
   }
 
+  get cards() {
+    return this.#appModel.cards;
+  }
+
   init() {
     this.#cards = [...this.#appModel.cards];
     this.#sourcedCards = [...this.#appModel.cards];
