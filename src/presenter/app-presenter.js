@@ -1,5 +1,6 @@
 import {render, remove} from '../framework/render.js';
 import AppModel from '../model/app-model.js';
+import FilterModel from './model/filter-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import {generateFilter} from '../mock/filter-mock.js';
 import CardPresenter from './card-presenter.js';
@@ -17,7 +18,6 @@ const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
 
 export default class AppPresenter {
-  #cards = null;
   #pageMainElement = null;
   #pageStatisticsElement = null;
   #pageHeaderElement = null;
@@ -38,6 +38,7 @@ export default class AppPresenter {
     const cards = Array.from({length: CARDS_COUNT}, getRandomCardWithComments);
     this.#appModel = new AppModel();
     this.#appModel.cards = cards;
+    const filterModel = new FilterModel();
 
     this.#appModel.addObserver(this.#handleModelEvent);
   }
@@ -101,7 +102,7 @@ export default class AppPresenter {
     this.#cardPresenter = new CardPresenter(
       this.#mainComponent,
       this.#resetCardsDetails,
-      this.#handleViewAction // #handleCardChange
+      this.#handleViewAction
     );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
@@ -128,12 +129,6 @@ export default class AppPresenter {
     this.#clearCards();
     this.#renderCardsList();
   };
-
-  // #handleCardChange = (actionType, updateType, updatedCard) => {
-  //   // Здесь будем вызывать обновление модели
-
-  //   this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
-  // };
 
   #handleViewAction = (actionType, updateType, updatedCard) => {
     switch (actionType) {

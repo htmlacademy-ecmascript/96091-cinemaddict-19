@@ -10,6 +10,7 @@ const EMOJI_IMAGES_SRC = {
 const DESCRIPTION_MAX_LENGTH = 140;
 
 const FilterType = {
+  ALL: 'all',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
