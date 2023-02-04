@@ -82,17 +82,17 @@ export default class CardPresenter {
 
   #handleWatchlistClick = () => {
     this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.MINOR, this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.PATCH, this.#card);
   };
 
   #handleWatchedClick = () => {
     this.#card.userDetails.isWatched = !this.#card.userDetails.isWatched;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.MINOR, this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.PATCH, this.#card);
   };
 
   #handleFavoriteClick = () => {
     this.#card.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.MINOR, this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.PATCH, this.#card);
   };
 
   #handleCardLinkClick = (card) => {

@@ -3,6 +3,8 @@ import AppModel from '../model/app-model.js';
 import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
 import {generateFilter} from '../mock/filter-mock.js';
 import CardPresenter from './card-presenter.js';
+import {SortType, UpdateType, UserAction} from '../const.js';
+import {sortByDate, sortByRating} from '../utils/sort-utils.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
@@ -10,8 +12,6 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
-import {SortType} from '../const.js';
-import {sortByDate, sortByRating} from '../utils/sort-utils.js';
 
 const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
@@ -135,20 +135,35 @@ export default class AppPresenter {
   //   this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
   // };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
+  #handleViewAction = (actionType, updateType, updatedCard) => {
+    switch (actionType) {
+      case UserAction.UPDATE_CARD:
+        this.#appModel.updateCard(updateType, updatedCard);
+        break;
+      case UserAction.ADD_CARD:
+        this.#appModel.addCard(updateType, updatedCard);
+        break;
+      case UserAction.DELETE_CARD:
+        this.#appModel.deleteCard(updateType, updatedCard);
+        break;
+    }
   };
 
-  #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
+  #handleModelEvent = (updateType, updatedCard) => {
+    console.log(updateType, updatedCard);
     // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+        break;
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+    }
   };
 
   #handleShowMoreButtonClick = () => {
