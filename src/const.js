@@ -21,4 +21,24 @@ const SortType = {
   RATING: 'rating',
 };
 
-export {X_COORD, EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH, FilterType, SortType};
+const UserAction = {
+  UPDATE_CARD: 'UPDATE_CARD',
+  ADD_CARD: 'ADD_CARD',
+  DELETE_CARD: 'DELETE_CARD',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {
+  X_COORD,
+  EMOJI_IMAGES_SRC,
+  DESCRIPTION_MAX_LENGTH,
+  FilterType,
+  SortType,
+  UserAction,
+  UpdateType
+};

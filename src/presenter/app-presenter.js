@@ -38,6 +38,8 @@ export default class AppPresenter {
     const cards = Array.from({length: CARDS_COUNT}, getRandomCardWithComments);
     this.#appModel = new AppModel();
     this.#appModel.cards = cards;
+
+    this.#appModel.addObserver(this.#handleModelEvent);
   }
 
   get cards() {
@@ -99,7 +101,7 @@ export default class AppPresenter {
     this.#cardPresenter = new CardPresenter(
       this.#mainComponent,
       this.#resetCardsDetails,
-      this.#handleCardChange
+      this.#handleViewAction // #handleCardChange
     );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
@@ -127,10 +129,26 @@ export default class AppPresenter {
     this.#renderCardsList();
   };
 
-  #handleCardChange = (updatedCard) => {
-    // Здесь будем вызывать обновление модели
+  // #handleCardChange = (actionType, updateType, updatedCard) => {
+  //   // Здесь будем вызывать обновление модели
 
-    this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  //   this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  // };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   };
 
   #handleShowMoreButtonClick = () => {
