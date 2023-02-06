@@ -27,27 +27,27 @@ export default class AppModel extends Observable {
     this._notify(updateType, updatedCard);
   }
 
-  addCard(updateType, update) {
-    this.#cards = [
-      update,
-      ...this.#cards,
-    ];
+  // addCard(updateType, update) {
+  //   this.#cards = [
+  //     update,
+  //     ...this.#cards,
+  //   ];
 
-    this._notify(updateType, update);
-  }
+  //   this._notify(updateType, update);
+  // }
 
-  deleteCard(updateType, update) {
-    const index = this.#cards.findIndex((card) => card.id === update.id);
+  // deleteCard(updateType, update) {
+  //   const index = this.#cards.findIndex((card) => card.id === update.id);
 
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting card');
-    }
+  //   if (index === -1) {
+  //     throw new Error('Can\'t delete unexisting card');
+  //   }
 
-    this.#cards = [
-      ...this.#cards.slice(0, index),
-      ...this.#cards.slice(index + 1),
-    ];
+  //   this.#cards = [
+  //     ...this.#cards.slice(0, index),
+  //     ...this.#cards.slice(index + 1),
+  //   ];
 
-    this._notify(updateType);
-  }
+  //   this._notify(updateType);
+  // }
 }

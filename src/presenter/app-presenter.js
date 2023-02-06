@@ -1,12 +1,8 @@
 import {render, remove} from '../framework/render.js';
-import AppModel from '../model/app-model.js';
-import FilterModel from './model/filter-model.js';
-import {getRandomCardWithComments} from '../mock/card-with-comment-mock.js';
-import {generateFilter} from '../mock/filter-mock.js';
-import CardPresenter from './card-presenter.js';
-import {SortType, UpdateType, UserAction} from '../const.js';
+import {FilterType, SortType, UpdateType, UserAction} from '../const.js';
 import {sortByDate, sortByRating} from '../utils/sort-utils.js';
-import FilterView from '../view/filter-view.js';
+import {filter} from '../utils/filter-utils.js';
+import CardPresenter from './card-presenter.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
@@ -14,80 +10,91 @@ import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
 
-const CARDS_COUNT = 12;
 const CARDS_COUNT_PER_STEP = 5;
 
 export default class AppPresenter {
+  #pageHeaderElement = null;
   #pageMainElement = null;
   #pageStatisticsElement = null;
-  #pageHeaderElement = null;
   #appModel = null;
+  #filterModel = null;
+  #userComponent = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
   #sortComponent = null;
+  #noCardComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
-  #filters = null;
   #cardPresenter = null;
   #cardPresenterMap = new Map();
+  #filteredCards = null;
   #currentSortType = SortType.DEFAULT;
 
-  constructor({pageMainElement, pageStatisticsElement, pageHeaderElement}) {
+  constructor(
+    pageHeaderElement,
+    pageMainElement,
+    pageStatisticsElement,
+    appModel,
+    filterModel
+  ) {
+    this.#pageHeaderElement = pageHeaderElement;
     this.#pageMainElement = pageMainElement;
     this.#pageStatisticsElement = pageStatisticsElement;
-    this.#pageHeaderElement = pageHeaderElement;
-    const cards = Array.from({length: CARDS_COUNT}, getRandomCardWithComments);
-    this.#appModel = new AppModel();
-    this.#appModel.cards = cards;
-    const filterModel = new FilterModel();
+
+    this.#appModel = appModel;
+    this.#filterModel = filterModel;
 
     this.#appModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get cards() {
+    const filterType = this.#filterModel.filter;
+    const cards = [...this.#appModel.cards];
+    if (filterType === FilterType.ALL) {
+      this.#filteredCards = cards;
+    } else {
+      this.#filteredCards = filter[filterType](cards);
+    }
+
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return [...this.#appModel.cards].sort(sortByDate);
+        return this.#filteredCards.sort(sortByDate);
       case SortType.RATING:
-        return [...this.#appModel.cards].sort(sortByRating);
+        return this.#filteredCards.sort(sortByRating);
     }
-    return this.#appModel.cards;
+    return this.#filteredCards;
   }
 
   init() {
     this.#renderCards();
+    render(new StatisticView(this.cards.length), this.#pageStatisticsElement);
   }
 
   #renderCards() {
-    render(new UserView(), this.#pageHeaderElement);
-    this.#renderFilter(this.cards);
+    this.#userComponent = new UserView();
+    render(this.#userComponent, this.#pageHeaderElement);
 
     if (this.cards.length === 0 || !this.cards) {
-      render(new NoCardView, this.#pageMainElement);
+      this.#noCardComponent = new NoCardView();
+      render(this.#noCardComponent, this.#pageMainElement);
       return;
     }
 
     this.#renderSort();
+
+    this.#mainComponent = new MainCardContainerView();
+    render(this.#mainComponent, this.#pageMainElement);
+
     this.#renderCardsList();
-    render(new StatisticView(this.cards.length), this.#pageStatisticsElement);
-  }
-
-  #renderFilter(cards) {
-    this.#filters = generateFilter(cards);
-
-    render(new FilterView(this.#filters), this.#pageMainElement);
   }
 
   #renderSort() {
-    this.#sortComponent = new SortView(this.#handleSortTypeChange);
+    this.#sortComponent = new SortView(this.#handleSortTypeChange, this.#currentSortType);
 
     render(this.#sortComponent, this.#pageMainElement);
   }
 
   #renderCardsList() {
-    this.#mainComponent = new MainCardContainerView();
-
-    render(this.#mainComponent, this.#pageMainElement);
-
     for (let i = 0; i < Math.min(this.cards.length, CARDS_COUNT_PER_STEP); i++) {
       this.#renderCard(this.cards[i]);
     }
@@ -109,9 +116,13 @@ export default class AppPresenter {
   }
 
   #clearCards() {
+    this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
     this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    remove(this.#userComponent);
+    remove(this.#noCardComponent);
+    remove(this.#sortComponent);
     remove(this.#mainComponent);
     remove(this.#showMoreButtonComponent);
   }
@@ -127,38 +138,7 @@ export default class AppPresenter {
 
     this.#currentSortType = sortType;
     this.#clearCards();
-    this.#renderCardsList();
-  };
-
-  #handleViewAction = (actionType, updateType, updatedCard) => {
-    switch (actionType) {
-      case UserAction.UPDATE_CARD:
-        this.#appModel.updateCard(updateType, updatedCard);
-        break;
-      case UserAction.ADD_CARD:
-        this.#appModel.addCard(updateType, updatedCard);
-        break;
-      case UserAction.DELETE_CARD:
-        this.#appModel.deleteCard(updateType, updatedCard);
-        break;
-    }
-  };
-
-  #handleModelEvent = (updateType, updatedCard) => {
-    console.log(updateType, updatedCard);
-    // В зависимости от типа изменений решаем, что делать:
-    switch (updateType) {
-      case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
-        this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
-        break;
-      case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
-        break;
-      case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
-        break;
-    }
+    this.#renderCards();
   };
 
   #handleShowMoreButtonClick = () => {
@@ -171,6 +151,32 @@ export default class AppPresenter {
     if (this.#renderedCardCount >= this.cards.length) {
       this.#showMoreButtonComponent.element.remove();
       this.#showMoreButtonComponent.removeElement();
+    }
+  };
+
+  #handleViewAction = (actionType, updateType, updatedCard) => {
+    switch (actionType) {
+      case UserAction.UPDATE_CARD:
+        this.#appModel.updateCard(updateType, updatedCard);
+        break;
+      case UserAction.UPDATE_COMMENTS:
+        // TO DO
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, updatedCard) => {
+    switch (updateType) {
+      case UpdateType.FILTRATION:
+        this.#currentSortType = SortType.DEFAULT;
+        this.#clearCards();
+        this.#renderCards();
+        break;
+
+      case UpdateType.CARD_UPDATING:
+        this.#clearCards();
+        this.#renderCards();
+        break;
     }
   };
 }

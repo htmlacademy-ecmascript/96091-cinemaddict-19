@@ -24,14 +24,13 @@ const SortType = {
 
 const UserAction = {
   UPDATE_CARD: 'UPDATE_CARD',
-  ADD_CARD: 'ADD_CARD',
-  DELETE_CARD: 'DELETE_CARD',
+  UPDATE_COMMENTS: 'UPDATE_COMMENTS'
 };
 
 const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+  FILTRATION: 'FILTRATION',
+  SORTING: 'SORTING',
+  CARD_UPDATING: 'CARD_UPDATING',
 };
 
 export {
