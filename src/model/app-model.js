@@ -1,5 +1,6 @@
 import Observable from '../framework/observable.js';
 import {adaptCardToClient} from '../utils/adapt-utils.js';
+import {UpdateType} from '../const.js';
 
 export default class AppModel extends Observable {
   #cards = [];
@@ -25,6 +26,7 @@ export default class AppModel extends Observable {
     } catch(err) {
       this.#cards = [];
     }
+    this._notify(UpdateType.INIT);
   }
 
   updateCard(updateType, updatedCard) {
