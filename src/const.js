@@ -31,6 +31,7 @@ const UpdateType = {
   FILTRATION: 'FILTRATION',
   SORTING: 'SORTING',
   CARD_UPDATING: 'CARD_UPDATING',
+  INIT: 'INIT',
 };
 
 export {

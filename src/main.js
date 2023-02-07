@@ -1,19 +1,17 @@
-import {getRandomCardWithComments} from './mock/card-with-comment-mock.js';
 import AppPresenter from './presenter/app-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-
+import CardsApiService from './cards-api-service.js';
 import AppModel from './model/app-model.js';
 import FilterModel from './model/filter-model.js';
-
-const CARDS_COUNT = 20;
 
 const pageHeaderElement = document.querySelector('.header');
 const pageMainElement = document.querySelector('.main');
 const pageStatisticsElement = document.querySelector('.footer__statistics');
 
-const cards = Array.from({length: CARDS_COUNT}, getRandomCardWithComments);
-const appModel = new AppModel();
-appModel.cards = cards;
+const AUTHORIZATION = 'Basic e98sdf83jdsd9ffkdw';
+const END_POINT = 'https://19.ecmascript.pages.academy/cinemaddict';
+
+const appModel = new AppModel({cardsApiService: new CardsApiService(END_POINT, AUTHORIZATION)});
 const filterModel = new FilterModel();
 
 const appPresenter = new AppPresenter(
@@ -30,5 +28,6 @@ const filterPresenter = new FilterPresenter(
   appModel
 );
 
+appModel.init();
 filterPresenter.init();
 appPresenter.init();

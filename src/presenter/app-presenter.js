@@ -9,6 +9,7 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
+import LoadingView from '../view/loading-view.js';
 
 const CARDS_COUNT_PER_STEP = 5;
 
@@ -23,11 +24,13 @@ export default class AppPresenter {
   #showMoreButtonComponent = null;
   #sortComponent = null;
   #noCardComponent = null;
+  #loadingComponent = null;
   #renderedCardCount = CARDS_COUNT_PER_STEP;
   #cardPresenter = null;
   #cardPresenterMap = new Map();
   #filteredCards = null;
   #currentSortType = SortType.DEFAULT;
+  #isLoading = true;
 
   constructor(
     pageHeaderElement,
@@ -71,8 +74,18 @@ export default class AppPresenter {
   }
 
   #renderCards() {
+
+    if (this.#isLoading) {
+      this.#loadingComponent = new LoadingView();
+      render(this.#loadingComponent, this.#pageMainElement);
+      return;
+    }
+
     this.#userComponent = new UserView();
     render(this.#userComponent, this.#pageHeaderElement);
+
+    this.#mainComponent = new MainCardContainerView();
+    render(this.#mainComponent, this.#pageMainElement);
 
     if (this.cards.length === 0 || !this.cards) {
       this.#noCardComponent = new NoCardView();
@@ -81,10 +94,6 @@ export default class AppPresenter {
     }
 
     this.#renderSort();
-
-    this.#mainComponent = new MainCardContainerView();
-    render(this.#mainComponent, this.#pageMainElement);
-
     this.#renderCardsList();
   }
 
@@ -116,7 +125,7 @@ export default class AppPresenter {
   }
 
   #clearCards() {
-    this.#resetCardsDetails();
+    // this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
     this.#renderedCardCount = CARDS_COUNT_PER_STEP;
@@ -125,6 +134,7 @@ export default class AppPresenter {
     remove(this.#sortComponent);
     remove(this.#mainComponent);
     remove(this.#showMoreButtonComponent);
+    remove(this.#loadingComponent);
   }
 
   #resetCardsDetails = () => {
@@ -175,6 +185,12 @@ export default class AppPresenter {
 
       case UpdateType.CARD_UPDATING:
         this.#clearCards();
+        this.#renderCards();
+        break;
+
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderCards();
         break;
     }

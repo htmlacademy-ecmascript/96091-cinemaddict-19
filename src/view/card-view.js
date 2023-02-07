@@ -11,7 +11,7 @@ function creatCardTemplate(card) {
       <p class="film-card__info">
         <span class="film-card__year">${humanizeReleaseDate(filmInfo.release.date)}</span>
         <span class="film-card__duration">${filmInfo.duration}</span>
-        <span class="film-card__genre">${filmInfo.genres[0]}</span>
+        <span class="film-card__genre">${filmInfo.genre[0]}</span>
       </p>
       <img src="${filmInfo.poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${reduceDescription(filmInfo.description)}</p>
