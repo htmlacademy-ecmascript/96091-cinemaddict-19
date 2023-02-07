@@ -1,4 +1,5 @@
 import ApiService from './framework/api-service.js';
+import {adaptCardToServer} from './utils/adapt-utils.js';
 
 const Method = {
   GET: 'GET',
@@ -6,8 +7,14 @@ const Method = {
 };
 
 export default class CardsApiService extends ApiService {
+
   get cards() {
     return this._load({url: 'movies'})
+      .then(ApiService.parseResponse);
+  }
+
+  getComments(card) {
+    return this._load({ url: `comments/${card.id}` })
       .then(ApiService.parseResponse);
   }
 
@@ -15,7 +22,7 @@ export default class CardsApiService extends ApiService {
     const response = await this._load({
       url: `movies/${card.id}`,
       method: Method.PUT,
-      body: JSON.stringify(card),
+      body: JSON.stringify(adaptCardToServer(card)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 

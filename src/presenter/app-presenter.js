@@ -116,7 +116,7 @@ export default class AppPresenter {
   }
 
   #clearCards() {
-    this.#resetCardsDetails();
+    // this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
     this.#renderedCardCount = CARDS_COUNT_PER_STEP;
