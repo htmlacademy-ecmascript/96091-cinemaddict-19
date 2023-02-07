@@ -2,6 +2,20 @@ import Observable from '../framework/observable.js';
 
 export default class AppModel extends Observable {
   #cards = [];
+  #cardsApiService = null;
+
+  constructor({cardsApiService}) {
+    super();
+    this.#cardsApiService = cardsApiService;
+
+    this.#cardsApiService.cards.then((cards) => {
+      console.log(cards);
+      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
+      // а ещё на сервере используется snake_case, а у нас camelCase.
+      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
+      // Есть вариант получше - паттерн "Адаптер"
+    });
+  }
 
   set cards(cards) {
     this.#cards = cards;
