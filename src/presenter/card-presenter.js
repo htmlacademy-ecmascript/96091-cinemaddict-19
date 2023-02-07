@@ -1,24 +1,25 @@
 import {render, replace, remove} from '../framework/render.js';
 import CardView from '../view/card-view.js';
 import CardDetailsPresenter from './card-details-presenter.js';
+import {UserAction, UpdateType} from '../const.js';
 
 export default class CardPresenter {
   #mainComponent = null;
   #card = null;
   #cardComponent = null;
   #cardDetailsPresenter = null;
-  #handleDataChange = null;
+  #handleViewAction = null;
   #isCardDetailsShow = false;
   #resetCardsDetails = null;
 
   constructor(
     cardContainer,
     resetCardsDetails,
-    onCardChange
+    onViewAction
   ) {
     this.#mainComponent = cardContainer;
     this.#resetCardsDetails = resetCardsDetails;
-    this.#handleDataChange = onCardChange;
+    this.#handleViewAction = onViewAction;
   }
 
   init(card) {
@@ -81,17 +82,17 @@ export default class CardPresenter {
 
   #handleWatchlistClick = () => {
     this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
-    this.#handleDataChange(this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
   };
 
   #handleWatchedClick = () => {
     this.#card.userDetails.isWatched = !this.#card.userDetails.isWatched;
-    this.#handleDataChange(this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
   };
 
   #handleFavoriteClick = () => {
     this.#card.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
-    this.#handleDataChange(this.#card);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
   };
 
   #handleCardLinkClick = (card) => {

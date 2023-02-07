@@ -10,6 +10,7 @@ const EMOJI_IMAGES_SRC = {
 const DESCRIPTION_MAX_LENGTH = 140;
 
 const FilterType = {
+  ALL: 'all',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
@@ -21,4 +22,23 @@ const SortType = {
   RATING: 'rating',
 };
 
-export {X_COORD, EMOJI_IMAGES_SRC, DESCRIPTION_MAX_LENGTH, FilterType, SortType};
+const UserAction = {
+  UPDATE_CARD: 'UPDATE_CARD',
+  UPDATE_COMMENTS: 'UPDATE_COMMENTS'
+};
+
+const UpdateType = {
+  FILTRATION: 'FILTRATION',
+  SORTING: 'SORTING',
+  CARD_UPDATING: 'CARD_UPDATING',
+};
+
+export {
+  X_COORD,
+  EMOJI_IMAGES_SRC,
+  DESCRIPTION_MAX_LENGTH,
+  FilterType,
+  SortType,
+  UserAction,
+  UpdateType
+};
