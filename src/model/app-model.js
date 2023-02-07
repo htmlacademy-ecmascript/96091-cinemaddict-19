@@ -8,10 +8,6 @@ export default class AppModel extends Observable {
   constructor({cardsApiService}) {
     super();
     this.#cardsApiService = cardsApiService;
-
-    this.#cardsApiService.cards.then((cards) => {
-      console.log(cards.map(adaptCardToClient));
-    });
   }
 
   set cards(cards) {
@@ -20,6 +16,15 @@ export default class AppModel extends Observable {
 
   get cards() {
     return this.#cards;
+  }
+
+  async init() {
+    try {
+      const cards = await this.#cardsApiService.cards;
+      this.#cards = cards.map(adaptCardToClient);
+    } catch(err) {
+      this.#cards = [];
+    }
   }
 
   updateCard(updateType, updatedCard) {
