@@ -156,7 +156,6 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
 
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiListClickHandler);
-    this.element.querySelector('.film-details__comment-input').addEventListener('change', this.#commentInputChangeHandler);
   }
 
   #cardDetailsCloseClickHandler = (evt) => {
@@ -199,12 +198,6 @@ export default class CardDetailsView extends AbstractStatefulView {
         }
       }
     );
-  };
-
-  #commentInputChangeHandler = (evt) => {
-    if (true) {
-      console.log(evt);
-    }
   };
 
   static parseCardToState(card){

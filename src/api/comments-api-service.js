@@ -1,10 +1,4 @@
 import ApiService from '../framework/api-service.js';
-import {adaptCardToServer} from '../utils/adapt-utils.js';
-
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
 
 export default class CommentsApiService extends ApiService {
 
