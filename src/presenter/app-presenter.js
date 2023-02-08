@@ -192,7 +192,6 @@ export default class AppPresenter {
         this.#appModel.updateCard(updateType, updatedCard);
         break;
       case UserAction.UPDATE_COMMENTS:
-        // TO DO
         break;
     }
   };

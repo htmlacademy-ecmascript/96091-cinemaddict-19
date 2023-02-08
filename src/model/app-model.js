@@ -29,14 +29,19 @@ export default class AppModel extends Observable {
     this._notify(UpdateType.INIT);
   }
 
-  updateCard(updateType, updatedCard) {
-    return this.#cardsApiService.updateCard(updatedCard)
-      .then((response) => {
-        const adaptedCard = adaptCardToClient(response);
+  async updateCard(updateType, updatedCard) {
+    const index = this.#cards.findIndex((card) => card.id === updatedCard.id);
 
-        this.#cards = this.#cards.map((card) => card.id === adaptedCard.id ? adaptedCard : card);
-
-        this._notify(updateType, updatedCard);
-      });
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting card');
+    }
+    const response = await this.#cardsApiService.updateCard(updatedCard);
+    const adaptedCard = adaptCardToClient(response);
+    this.#cards = [
+      ...this.#cards.slice(0, index),
+      adaptedCard,
+      ...this.#cards.slice(index + 1),
+    ];
+    this._notify(updateType, adaptedCard);
   }
 }
