@@ -11,15 +11,18 @@ export default class CardPresenter {
   #handleViewAction = null;
   #isCardDetailsShow = false;
   #resetCardsDetails = null;
+  #commentsModel = null;
 
   constructor(
     cardContainer,
     resetCardsDetails,
-    onViewAction
+    onViewAction,
+    commentsModel
   ) {
     this.#mainComponent = cardContainer;
     this.#resetCardsDetails = resetCardsDetails;
     this.#handleViewAction = onViewAction;
+    this.#commentsModel = commentsModel;
   }
 
   init(card) {
@@ -44,7 +47,8 @@ export default class CardPresenter {
     }
 
     if (this.#cardDetailsPresenter !== null) {
-      this.#cardDetailsPresenter.init(card);
+      const comments = this.#commentsModel.comments;
+      this.#cardDetailsPresenter.init(card, comments);
     }
 
     remove(prevCardComponent);
@@ -54,14 +58,16 @@ export default class CardPresenter {
     remove(this.#cardComponent);
   }
 
-  #showCardDetails(card) {
+  async #showCardDetails(card) {
+    await this.#commentsModel.init(card);
+    const comments = this.#commentsModel.comments;
     this.#cardDetailsPresenter = new CardDetailsPresenter(
       this.#handleCardDetailsCloseClick,
       this.#handleWatchlistClick,
       this.#handleWatchedClick,
       this.#handleFavoriteClick
     );
-    this.#cardDetailsPresenter.init(card);
+    this.#cardDetailsPresenter.init(card, comments);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#isCardDetailsShow = true;
   }

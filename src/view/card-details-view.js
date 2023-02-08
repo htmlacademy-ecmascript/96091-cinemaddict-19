@@ -56,8 +56,8 @@ function creatCardDetailsTemplate(card) {
                 <td class="film-details__cell">${filmInfo.release.releaseCountry}</td>
               </tr>
               <tr class="film-details__row">
-                <td class="film-details__term">${filmInfo.genres.length > 1 ? 'Genres' : 'Genre'}</td>
-                <td class="film-details__cell">${filmInfo.genres.map((genre) => (`<span class="film-details__genre">${genre}</span>`)).join('')}</td>
+                <td class="film-details__term">${filmInfo.genre.length > 1 ? 'Genres' : 'Genre'}</td>
+                <td class="film-details__cell">${filmInfo.genre.map((genre) => (`<span class="film-details__genre">${genre}</span>`)).join('')}</td>
               </tr>
             </table>
 
@@ -127,13 +127,14 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   constructor(
     card,
+    comments,
     onCardDetailsCloseClick,
     onWatchlistClick,
     onWatchedClick,
     onFavoriteClick
   ) {
     super();
-    this._setState(CardDetailsView.parseCardToState(card));
+    this._setState(CardDetailsView.parseCardToState({...card, comments}));
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
@@ -143,6 +144,7 @@ export default class CardDetailsView extends AbstractStatefulView {
   }
 
   get template() {
+
     return creatCardDetailsTemplate(this._state);
   }
 

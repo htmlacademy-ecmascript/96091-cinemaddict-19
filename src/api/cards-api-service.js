@@ -1,5 +1,5 @@
-import ApiService from './framework/api-service.js';
-import {adaptCardToServer} from './utils/adapt-utils.js';
+import ApiService from '../framework/api-service.js';
+import {adaptCardToServer} from '../utils/adapt-utils.js';
 
 const Method = {
   GET: 'GET',
@@ -10,11 +10,6 @@ export default class CardsApiService extends ApiService {
 
   get cards() {
     return this._load({url: 'movies'})
-      .then(ApiService.parseResponse);
-  }
-
-  getComments(card) {
-    return this._load({ url: `comments/${card.id}` })
       .then(ApiService.parseResponse);
   }
 

@@ -3,6 +3,7 @@ import CardDetailsView from '../view/card-details-view.js';
 
 export default class CardDetailsPresenter {
   #card = null;
+  #comments = null;
   #cardDetailsComponent = null;
   #handleCardDetailsCloseClick = null;
   #handleWatchlistClick = null;
@@ -21,14 +22,16 @@ export default class CardDetailsPresenter {
     this.#handleFavoriteClick = onFavoriteClick;
   }
 
-  init(card) {
+  init(card, comments) {
     this.#card = card;
+    this.#comments = comments;
     const prevCardDetailsComponent = this.#cardDetailsComponent;
 
     document.body.classList.add('hide-overflow');
 
     this.#cardDetailsComponent = new CardDetailsView(
       this.#card,
+      this.#comments,
       this.#handleCardDetailsCloseClick,
       this.#handleWatchlistClick,
       this.#handleWatchedClick,
