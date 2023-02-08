@@ -18,8 +18,10 @@ export default class AppPresenter {
   #pageMainElement = null;
   #pageStatisticsElement = null;
   #appModel = null;
+  #commentsModel = null;
   #filterModel = null;
   #userComponent = null;
+  #statisticComponent = null;
   #mainComponent = null;
   #showMoreButtonComponent = null;
   #sortComponent = null;
@@ -31,12 +33,15 @@ export default class AppPresenter {
   #filteredCards = null;
   #currentSortType = SortType.DEFAULT;
   #isLoading = true;
+  #isResetRenderedCardCount = true;
+  #updatedCards = [];
 
   constructor(
     pageHeaderElement,
     pageMainElement,
     pageStatisticsElement,
     appModel,
+    commentsModel,
     filterModel
   ) {
     this.#pageHeaderElement = pageHeaderElement;
@@ -45,6 +50,7 @@ export default class AppPresenter {
 
     this.#appModel = appModel;
     this.#filterModel = filterModel;
+    this.#commentsModel = commentsModel;
 
     this.#appModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -70,7 +76,6 @@ export default class AppPresenter {
 
   init() {
     this.#renderCards();
-    render(new StatisticView(this.cards.length), this.#pageStatisticsElement);
   }
 
   #renderCards() {
@@ -81,20 +86,30 @@ export default class AppPresenter {
       return;
     }
 
-    this.#userComponent = new UserView();
-    render(this.#userComponent, this.#pageHeaderElement);
-
-    this.#mainComponent = new MainCardContainerView();
-    render(this.#mainComponent, this.#pageMainElement);
+    this.#renderUser();
 
     if (this.cards.length === 0 || !this.cards) {
-      this.#noCardComponent = new NoCardView();
+      this.#noCardComponent = new NoCardView(this.#filterModel.filter);
       render(this.#noCardComponent, this.#pageMainElement);
       return;
     }
 
     this.#renderSort();
     this.#renderCardsList();
+
+    this.#statisticComponent = new StatisticView(this.#appModel.cards.length);
+    render(this.#statisticComponent, this.#pageStatisticsElement);
+  }
+
+  #renderUser() {
+    const prevUserComponent = this.#userComponent;
+    this.#userComponent = new UserView(filter[FilterType.HISTORY](this.#appModel.cards).length);
+    if (prevUserComponent === null) {
+      render(this.#userComponent, this.#pageHeaderElement);
+      return;
+    }
+    render(this.#userComponent, this.#pageHeaderElement);
+    remove(prevUserComponent);
   }
 
   #renderSort() {
@@ -104,11 +119,14 @@ export default class AppPresenter {
   }
 
   #renderCardsList() {
-    for (let i = 0; i < Math.min(this.cards.length, CARDS_COUNT_PER_STEP); i++) {
+    this.#mainComponent = new MainCardContainerView();
+    render(this.#mainComponent, this.#pageMainElement);
+
+    for (let i = 0; i < Math.min(this.cards.length, this.#renderedCardCount); i++) {
       this.#renderCard(this.cards[i]);
     }
 
-    if (this.cards.length > CARDS_COUNT_PER_STEP) {
+    if (this.cards.length > this.#renderedCardCount) {
       this.#showMoreButtonComponent = new ShowMoreButtonView(this.#handleShowMoreButtonClick);
       render(this.#showMoreButtonComponent, this.#mainComponent.filmList);
     }
@@ -118,23 +136,27 @@ export default class AppPresenter {
     this.#cardPresenter = new CardPresenter(
       this.#mainComponent,
       this.#resetCardsDetails,
-      this.#handleViewAction
+      this.#handleViewAction,
+      this.#commentsModel
     );
     this.#cardPresenter.init(card);
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
   }
 
   #clearCards() {
-    // this.#resetCardsDetails();
+    this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
-    this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    if (this.#isResetRenderedCardCount) {
+      this.#renderedCardCount = CARDS_COUNT_PER_STEP;
+    }
     remove(this.#userComponent);
     remove(this.#noCardComponent);
     remove(this.#sortComponent);
     remove(this.#mainComponent);
     remove(this.#showMoreButtonComponent);
     remove(this.#loadingComponent);
+    remove(this.#statisticComponent);
   }
 
   #resetCardsDetails = () => {
@@ -170,22 +192,31 @@ export default class AppPresenter {
         this.#appModel.updateCard(updateType, updatedCard);
         break;
       case UserAction.UPDATE_COMMENTS:
-        // TO DO
         break;
     }
   };
 
   #handleModelEvent = (updateType, updatedCard) => {
+    this.#updatedCards.push(updatedCard);
     switch (updateType) {
       case UpdateType.FILTRATION:
         this.#currentSortType = SortType.DEFAULT;
+        this.#isResetRenderedCardCount = true;
         this.#clearCards();
         this.#renderCards();
         break;
 
       case UpdateType.CARD_UPDATING:
-        this.#clearCards();
-        this.#renderCards();
+        this.#renderUser();
+        if (this.#filterModel.filter === FilterType.ALL) {
+          this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+        } else if (filter[this.#filterModel.filter](this.#updatedCards).length) {
+          this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+        } else {
+          this.#isResetRenderedCardCount = false;
+          this.#clearCards();
+          this.#renderCards();
+        }
         break;
 
       case UpdateType.INIT:
@@ -194,5 +225,6 @@ export default class AppPresenter {
         this.#renderCards();
         break;
     }
+    this.#updatedCards.pop(updatedCard);
   };
 }
