@@ -30,42 +30,13 @@ export default class AppModel extends Observable {
   }
 
   updateCard(updateType, updatedCard) {
-    const index = this.#cards.findIndex((card) => card.id === updatedCard.id);
+    return this.#cardsApiService.updateCard(updatedCard)
+      .then((response) => {
+        const adaptedCard = adaptCardToClient(response);
 
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting card');
-    }
+        this.#cards = this.#cards.map((card) => card.id === adaptedCard.id ? adaptedCard : card);
 
-    this.#cards = [
-      ...this.#cards.slice(0, index),
-      updatedCard,
-      ...this.#cards.slice(index + 1),
-    ];
-
-    this._notify(updateType, updatedCard);
+        this._notify(updateType, updatedCard);
+      });
   }
-
-  // addCard(updateType, update) {
-  //   this.#cards = [
-  //     update,
-  //     ...this.#cards,
-  //   ];
-
-  //   this._notify(updateType, update);
-  // }
-
-  // deleteCard(updateType, update) {
-  //   const index = this.#cards.findIndex((card) => card.id === update.id);
-
-  //   if (index === -1) {
-  //     throw new Error('Can\'t delete unexisting card');
-  //   }
-
-  //   this.#cards = [
-  //     ...this.#cards.slice(0, index),
-  //     ...this.#cards.slice(index + 1),
-  //   ];
-
-  //   this._notify(updateType);
-  // }
 }
