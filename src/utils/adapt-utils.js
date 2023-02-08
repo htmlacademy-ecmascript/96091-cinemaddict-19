@@ -53,4 +53,16 @@ function adaptCardToServer(card) {
   return card;
 }
 
-export {adaptCardToClient, adaptCardToServer};
+function adaptCommentsToClient(comments) {
+  comments.date = new Date(comments.date);
+
+  return comments;
+}
+
+function adaptCommentsToServer(comments) {
+  comments.date = comments.date.toISOString();
+
+  return comments;
+}
+
+export {adaptCardToClient, adaptCardToServer, adaptCommentsToClient, adaptCommentsToServer};
