@@ -89,7 +89,7 @@ function creatCardDetailsTemplate(card) {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
         </p>
       </div>
     </li>`
@@ -124,6 +124,8 @@ export default class CardDetailsView extends AbstractStatefulView {
   #handleWatchlistClick = null;
   #handleWatchedClick = null;
   #handleFavoriteClick = null;
+  #handleCommentKeyDown = null;
+  #handleDeleteButtonClick = null;
 
   constructor(
     card,
@@ -131,7 +133,9 @@ export default class CardDetailsView extends AbstractStatefulView {
     onCardDetailsCloseClick,
     onWatchlistClick,
     onWatchedClick,
-    onFavoriteClick
+    onFavoriteClick,
+    onCommentKeyDown,
+    onDeleteButtonClick
   ) {
     super();
     this._setState(CardDetailsView.parseCardToState({...card, comments}));
@@ -139,7 +143,8 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
     this.#handleFavoriteClick = onFavoriteClick;
-
+    this.#handleCommentKeyDown = onCommentKeyDown;
+    this.#handleDeleteButtonClick = onDeleteButtonClick;
     this._restoreHandlers();
   }
 
@@ -156,6 +161,10 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
 
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiListClickHandler);
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentKeyDownHandler);
+
+    this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#deleteButtonClickHandler);
   }
 
   #cardDetailsCloseClickHandler = (evt) => {
@@ -194,10 +203,30 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelectorAll('.film-details__emoji-item').forEach(
       (element) => {
         if (element.value === evt.target.value) {
-          element.setAttribute('checked','');
+          element.checked = 'true';
         }
       }
     );
+
+    this._setState({comment: { ...this._state.comment, emotion: evt.target.value}});
+  };
+
+  #commentInputHandler = (evt) => {
+    this._setState({comment: { ...this._state.comment, comment: evt.target.value.trim()}});
+  };
+
+  #commentKeyDownHandler = (evt) => {
+    if (evt.key === 'Enter' && evt.ctrlKey) {
+      this.#handleCommentKeyDown(this._state.comment);
+    }
+  };
+
+  #deleteButtonClickHandler = (evt) => {
+    if (evt.target.tagName !== 'BUTTON') {
+      return;
+    }
+    evt.preventDefault();
+    this.#handleDeleteButtonClick(evt.target.dataset.id);
   };
 
   static parseCardToState(card){
@@ -205,7 +234,8 @@ export default class CardDetailsView extends AbstractStatefulView {
       ...card,
       emojis: ['smile', 'sleeping', 'puke', 'angry'],
       emojiTemplate: null,
-      isEmojiChecked: false
+      isEmojiChecked: false,
+      comment: { comment: '', emotion: '' }
     };
   }
 

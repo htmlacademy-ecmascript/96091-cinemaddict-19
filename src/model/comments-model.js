@@ -1,5 +1,5 @@
 import Observable from '../framework/observable.js';
-import {adaptCommentsToClient} from '../utils/adapt-utils.js';
+import {adaptCommentsToClient, adaptCardToClient} from '../utils/adapt-utils.js';
 
 export default class CommentsModel extends Observable {
   #comments = [];
@@ -25,5 +25,22 @@ export default class CommentsModel extends Observable {
     } catch(err) {
       this.#comments = [];
     }
+  }
+
+  addComment(card, comment) {
+    return this.#commentsApiService.addComment(card, comment)
+      .then((response) => {
+        const updatedCard = adaptCardToClient(response.movie);
+        this.#comments = response.comments.map((it) => adaptCommentsToClient(it));
+        this._notify(updatedCard);
+      });
+  }
+
+  deleteComment(id) {
+    return this.#commentsApiService.deleteComment(id)
+      .then(() => {
+        this.#comments = this.#comments.filter((comment) => comment.id !== id);
+        this._notify(this.#comments);
+      });
   }
 }

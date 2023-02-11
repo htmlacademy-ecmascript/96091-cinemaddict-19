@@ -24,7 +24,8 @@ const SortType = {
 
 const UserAction = {
   UPDATE_CARD: 'UPDATE_CARD',
-  UPDATE_COMMENTS: 'UPDATE_COMMENTS'
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT'
 };
 
 const UpdateType = {
@@ -34,6 +35,13 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
+const Method = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE'
+};
+
 export {
   X_COORD,
   EMOJI_IMAGES_SRC,
@@ -41,5 +49,6 @@ export {
   FilterType,
   SortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  Method
 };

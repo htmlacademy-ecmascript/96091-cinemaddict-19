@@ -144,7 +144,7 @@ export default class AppPresenter {
   }
 
   #clearCards() {
-    this.#resetCardsDetails();
+    //this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
     if (this.#isResetRenderedCardCount) {
@@ -191,7 +191,8 @@ export default class AppPresenter {
       case UserAction.UPDATE_CARD:
         this.#appModel.updateCard(updateType, updatedCard);
         break;
-      case UserAction.UPDATE_COMMENTS:
+
+      case UserAction.ADD_COMMENT:
         break;
     }
   };
