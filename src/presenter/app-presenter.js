@@ -145,6 +145,9 @@ export default class AppPresenter {
   }
 
   #showCardDetails = async (card) => {
+    if (this.#cardDetailsPresenter) {
+      this.#hideCardDetails();
+    }
     this.#cardDetailsPresenter = new CardDetailsPresenter(
       this.#commentsModel,
       this.#handleViewAction,
