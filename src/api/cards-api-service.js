@@ -1,10 +1,6 @@
 import ApiService from '../framework/api-service.js';
 import {adaptCardToServer} from '../utils/adapt-utils.js';
-
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-};
+import {Method} from '../const.js';
 
 export default class CardsApiService extends ApiService {
 

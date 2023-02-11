@@ -9,17 +9,23 @@ export default class CardDetailsPresenter {
   #handleWatchlistClick = null;
   #handleWatchedClick = null;
   #handleFavoriteClick = null;
+  #handleCommentKeyDown = null;
+  #handleDeleteButtonClick = null;
 
   constructor(
     onCardDetailsCloseClick,
     onWatchlistClick,
     onWatchedClick,
-    onFavoriteClick
+    onFavoriteClick,
+    onCommentKeyDown,
+    onDeleteButtonClick
   ) {
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
     this.#handleFavoriteClick = onFavoriteClick;
+    this.#handleCommentKeyDown = onCommentKeyDown;
+    this.#handleDeleteButtonClick = onDeleteButtonClick;
   }
 
   init(card, comments) {
@@ -35,7 +41,10 @@ export default class CardDetailsPresenter {
       this.#handleCardDetailsCloseClick,
       this.#handleWatchlistClick,
       this.#handleWatchedClick,
-      this.#handleFavoriteClick
+      this.#handleFavoriteClick,
+      this.#handleCommentKeyDown,
+      this.#handleDeleteButtonClick
+
     );
 
     if (prevCardDetailsComponent === null) {

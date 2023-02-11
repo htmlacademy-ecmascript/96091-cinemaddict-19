@@ -23,6 +23,8 @@ export default class CardPresenter {
     this.#resetCardsDetails = resetCardsDetails;
     this.#handleViewAction = onViewAction;
     this.#commentsModel = commentsModel;
+
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   init(card) {
@@ -65,7 +67,9 @@ export default class CardPresenter {
       this.#handleCardDetailsCloseClick,
       this.#handleWatchlistClick,
       this.#handleWatchedClick,
-      this.#handleFavoriteClick
+      this.#handleFavoriteClick,
+      this.#handleCommentKeyDown,
+      this.#handleDeleteButtonClick
     );
     this.#cardDetailsPresenter.init(card, comments);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -116,4 +120,38 @@ export default class CardPresenter {
       this.#hideCardDetails();
     }
   };
+
+  #handleCommentKeyDown = (comment) => {
+    this.#commentsModel.addComment(this.#card, comment);
+  };
+
+  #handleDeleteButtonClick = (id) => {
+    this.#commentsModel.deleteComment(id);
+  };
+
+  #handleModelEvent = () => {
+    this.init(this.#card);
+  };
+  //   switch (updateType) {
+  //     case UpdateType.FILTRATION:
+  //       this.#currentSortType = SortType.DEFAULT;
+  //       this.#isResetRenderedCardCount = true;
+  //       this.#clearCards();
+  //       this.#renderCards();
+  //       break;
+
+  //     case UpdateType.CARD_UPDATING:
+  //       this.#renderUser();
+  //       if (this.#filterModel.filter === FilterType.ALL) {
+  //         this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  //       } else if (filter[this.#filterModel.filter](this.#updatedCards).length) {
+  //         this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
+  //       } else {
+  //         this.#isResetRenderedCardCount = false;
+  //         this.#clearCards();
+  //         this.#renderCards();
+  //       }
+  //       break;
+  //   }
+  // };
 }
