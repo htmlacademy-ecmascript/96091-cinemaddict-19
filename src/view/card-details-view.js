@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card-utils.js';
-import {X_COORD, EMOJI_IMAGES_SRC} from '../const.js';
+import {EMOJI_IMAGES_SRC} from '../const.js';
+
+const DEFAULT_SCROLL_POSITION = 0;
+const SCROLL_X_POSITION = 0;
 
 function creatCardDetailsTemplate(card) {
   const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked} = card;
@@ -138,7 +141,15 @@ export default class CardDetailsView extends AbstractStatefulView {
     onDeleteButtonClick
   ) {
     super();
-    this._setState(CardDetailsView.parseCardToState({...card, comments}));
+    this._setState({
+      ...card,
+      comments,
+      emojis: ['smile', 'sleeping', 'puke', 'angry'],
+      emojiTemplate: null,
+      isEmojiChecked: false,
+      comment: { comment: '', emotion: '' },
+      scrollPosition: DEFAULT_SCROLL_POSITION
+    });
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleWatchedClick = onWatchedClick;
@@ -155,17 +166,27 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#cardDetailsCloseClickHandler);
-
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
     this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
-
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#emojiListClickHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentKeyDownHandler);
-
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#deleteButtonClickHandler);
+    this.element.addEventListener('scroll', this.#scrollPositionHandler);
   }
+
+  getScrollPosition() {
+    return this._state.scrollPosition;
+  }
+
+  setScrollPosition(scrollPosition) {
+    this.element.scrollTo(SCROLL_X_POSITION, scrollPosition);
+  }
+
+  #scrollPositionHandler = () => {
+    this._setState({ scrollPosition: this.element.scrollTop });
+  };
 
   #cardDetailsCloseClickHandler = (evt) => {
     evt.preventDefault();
@@ -198,7 +219,7 @@ export default class CardDetailsView extends AbstractStatefulView {
       scrollPosition: this.element.scrollTop
     });
 
-    this.element.scrollTo(X_COORD, this._state.scrollPosition);
+    this.element.scrollTo(SCROLL_X_POSITION, this._state.scrollPosition);
 
     this.element.querySelectorAll('.film-details__emoji-item').forEach(
       (element) => {
@@ -228,23 +249,4 @@ export default class CardDetailsView extends AbstractStatefulView {
     evt.preventDefault();
     this.#handleDeleteButtonClick(evt.target.dataset.id);
   };
-
-  static parseCardToState(card){
-    return {
-      ...card,
-      emojis: ['smile', 'sleeping', 'puke', 'angry'],
-      emojiTemplate: null,
-      isEmojiChecked: false,
-      comment: { comment: '', emotion: '' }
-    };
-  }
-
-  static parseStateToCard(state){
-    const card = {state};
-
-    delete card.emojis;
-    delete card.emojiTemplate;
-    delete card.isEmojiChecked;
-    return card;
-  }
 }

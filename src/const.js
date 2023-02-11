@@ -1,5 +1,3 @@
-const X_COORD = 0;
-
 const EMOJI_IMAGES_SRC = {
   smile: './images/emoji/smile.png',
   sleeping: './images/emoji/sleeping.png',
@@ -43,7 +41,6 @@ const Method = {
 };
 
 export {
-  X_COORD,
   EMOJI_IMAGES_SRC,
   DESCRIPTION_MAX_LENGTH,
   FilterType,

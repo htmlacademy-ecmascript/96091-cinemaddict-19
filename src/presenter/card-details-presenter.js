@@ -49,6 +49,8 @@ export default class CardDetailsPresenter {
 
     if (document.body.contains(prevCardDetailsComponent.element)) {
       replace(this.#cardDetailsComponent, prevCardDetailsComponent);
+      const scrollPosition = prevCardDetailsComponent.getScrollPosition();
+      this.#cardDetailsComponent.setScrollPosition(scrollPosition);
     }
 
     remove(prevCardDetailsComponent);
