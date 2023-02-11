@@ -3,6 +3,7 @@ import {FilterType, SortType, UpdateType, UserAction} from '../const.js';
 import {sortByDate, sortByRating} from '../utils/sort-utils.js';
 import {filter} from '../utils/filter-utils.js';
 import CardPresenter from './card-presenter.js';
+import CardDetailsPresenter from './card-details-presenter.js';
 import SortView from '../view/sort-view.js';
 import MainCardContainerView from '../view/main-card-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
@@ -34,7 +35,7 @@ export default class AppPresenter {
   #currentSortType = SortType.DEFAULT;
   #isLoading = true;
   #isResetRenderedCardCount = true;
-  #updatedCards = [];
+  #cardDetailsPresenter = null;
 
   constructor(
     pageHeaderElement,
@@ -135,7 +136,7 @@ export default class AppPresenter {
   #renderCard(card) {
     this.#cardPresenter = new CardPresenter(
       this.#mainComponent,
-      this.#resetCardsDetails,
+      this.#showCardDetails,
       this.#handleViewAction,
       this.#commentsModel
     );
@@ -143,8 +144,23 @@ export default class AppPresenter {
     this.#cardPresenterMap.set(card.id, this.#cardPresenter);
   }
 
+  #showCardDetails = async (card) => {
+    this.#cardDetailsPresenter = new CardDetailsPresenter(
+      this.#commentsModel,
+      this.#handleViewAction,
+      this.#hideCardDetails
+    );
+    this.#cardDetailsPresenter.init(card);
+  };
+
+  #hideCardDetails = () => {
+    if (this.#cardDetailsPresenter) {
+      this.#cardDetailsPresenter.destroy();
+      this.#cardDetailsPresenter = null;
+    }
+  };
+
   #clearCards() {
-    //this.#resetCardsDetails();
     this.#cardPresenterMap.forEach((presenter) => presenter.destroy());
     this.#cardPresenterMap.clear();
     if (this.#isResetRenderedCardCount) {
@@ -158,10 +174,6 @@ export default class AppPresenter {
     remove(this.#loadingComponent);
     remove(this.#statisticComponent);
   }
-
-  #resetCardsDetails = () => {
-    this.#cardPresenterMap.forEach((presenter) => presenter.resetCardDetails());
-  };
 
   #handleSortTypeChange = (sortType) => {
     if (this.#currentSortType === sortType) {
@@ -198,7 +210,6 @@ export default class AppPresenter {
   };
 
   #handleModelEvent = (updateType, updatedCard) => {
-    this.#updatedCards.push(updatedCard);
     switch (updateType) {
       case UpdateType.FILTRATION:
         this.#currentSortType = SortType.DEFAULT;
@@ -209,9 +220,12 @@ export default class AppPresenter {
 
       case UpdateType.CARD_UPDATING:
         this.#renderUser();
+
+        if (this.#cardDetailsPresenter) {
+          this.#cardDetailsPresenter.init(updatedCard);
+        }
+
         if (this.#filterModel.filter === FilterType.ALL) {
-          this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
-        } else if (filter[this.#filterModel.filter](this.#updatedCards).length) {
           this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
         } else {
           this.#isResetRenderedCardCount = false;
@@ -226,6 +240,5 @@ export default class AppPresenter {
         this.#renderCards();
         break;
     }
-    this.#updatedCards.pop(updatedCard);
   };
 }
