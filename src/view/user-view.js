@@ -4,11 +4,11 @@ function getUserRank(userCount) {
   if (userCount === 0) {
     return '';
   } else if (userCount > 0 && userCount <= 10){
-    return 'novice';
+    return 'Novice';
   } else if (userCount > 10 && userCount <= 20){
-    return 'fan';
+    return 'Fan';
   } else if (userCount > 20){
-    return 'movie buff';
+    return 'Movie Buff';
   }
 }
 

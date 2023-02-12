@@ -11,8 +11,13 @@ import StatisticView from '../view/statistic-view.js';
 import UserView from '../view/user-view.js';
 import NoCardView from '../view/no-card-view.js';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const CARDS_COUNT_PER_STEP = 5;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class AppPresenter {
   #pageHeaderElement = null;
@@ -36,6 +41,10 @@ export default class AppPresenter {
   #isLoading = true;
   #isResetRenderedCardCount = true;
   #cardDetailsPresenter = null;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor(
     pageHeaderElement,
@@ -202,6 +211,7 @@ export default class AppPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, updatedCard) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_CARD:
         try {
@@ -211,6 +221,7 @@ export default class AppPresenter {
         }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, updatedCard) => {
@@ -225,7 +236,7 @@ export default class AppPresenter {
       case UpdateType.CARD_UPDATING:
         this.#renderUser();
 
-        if (this.#cardDetailsPresenter) {
+        if (this.#cardDetailsPresenter && this.#cardDetailsPresenter.card.id === updatedCard.id) {
           this.#cardDetailsPresenter.init(updatedCard);
         }
 

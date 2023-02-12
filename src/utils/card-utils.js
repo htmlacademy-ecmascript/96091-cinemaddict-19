@@ -3,7 +3,7 @@ import {DESCRIPTION_MAX_LENGTH} from '../const.js';
 
 const FULL_DATE_FORMAT = 'DD MMMM YYYY';
 const SHORT_DATE_FORMAT = 'YYYY';
-const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH/mm';
+const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:mm';
 
 function humanizeReleaseDate(date, isFullFormat = false) {
   if (isFullFormat) {

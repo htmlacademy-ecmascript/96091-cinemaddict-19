@@ -29,12 +29,12 @@ export default class FilterPresenter {
       },
       {
         type: FilterType.HISTORY,
-        name: 'history',
+        name: 'History',
         count: filter[FilterType.HISTORY](cards).length,
       },
       {
         type: FilterType.FAVORITES,
-        name: 'favorites',
+        name: 'Favorites',
         count: filter[FilterType.FAVORITES](cards).length,
       }
     ];
