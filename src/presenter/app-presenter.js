@@ -201,13 +201,14 @@ export default class AppPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, updatedCard) => {
+  #handleViewAction = async (actionType, updateType, updatedCard) => {
     switch (actionType) {
       case UserAction.UPDATE_CARD:
-        this.#appModel.updateCard(updateType, updatedCard);
-        break;
-
-      case UserAction.ADD_COMMENT:
+        try {
+          await this.#appModel.updateCard(updateType, updatedCard);
+        } catch(err) {
+          this.#cardPresenterMap.get(updatedCard.id).setAborting();
+        }
         break;
     }
   };

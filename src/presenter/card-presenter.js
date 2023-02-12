@@ -46,6 +46,10 @@ export default class CardPresenter {
     remove(this.#cardComponent);
   }
 
+  setAborting() {
+    this.#cardComponent.shake();
+  }
+
   #handleWatchlistClick = () => {
     this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
     this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);

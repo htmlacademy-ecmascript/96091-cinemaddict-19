@@ -30,18 +30,22 @@ export default class AppModel extends Observable {
   }
 
   async updateCard(updateType, updatedCard) {
-    const index = this.#cards.findIndex((card) => card.id === updatedCard.id);
+    try {
+      const index = this.#cards.findIndex((card) => card.id === updatedCard.id);
 
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting card');
+      if (index === -1) {
+        throw new Error('Can\'t update unexisting card');
+      }
+      const response = await this.#cardsApiService.updateCard(updatedCard);
+      const adaptedCard = adaptCardToClient(response);
+      this.#cards = [
+        ...this.#cards.slice(0, index),
+        adaptedCard,
+        ...this.#cards.slice(index + 1),
+      ];
+      this._notify(updateType, adaptedCard);
+    } catch(err) {
+      throw new Error('Can\'t update card');
     }
-    const response = await this.#cardsApiService.updateCard(updatedCard);
-    const adaptedCard = adaptCardToClient(response);
-    this.#cards = [
-      ...this.#cards.slice(0, index),
-      adaptedCard,
-      ...this.#cards.slice(index + 1),
-    ];
-    this._notify(updateType, adaptedCard);
   }
 }

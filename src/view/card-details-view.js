@@ -6,7 +6,7 @@ const DEFAULT_SCROLL_POSITION = 0;
 const SCROLL_X_POSITION = 0;
 
 function creatCardDetailsTemplate(card) {
-  const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked} = card;
+  const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked, isDeleting, isSubmitting, deletingCommentId} = card;
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -92,18 +92,19 @@ function creatCardDetailsTemplate(card) {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${humanizeCommentDate(comment.date)}</span>
-          <button class="film-details__comment-delete" data-id="${comment.id}">Delete</button>
+          <button class="film-details__comment-delete" data-id="${comment.id}">
+          ${isDeleting && deletingCommentId === comment.id ? 'Deleting...' : 'Delete'}</button>
         </p>
       </div>
     </li>`
   )).join('')}
           </ul>
 
-          <form class="film-details__new-comment" action="" method="get">
+          <form class="film-details__new-comment" action="" ${isSubmitting ? 'disabled' : ''} method="get">
             <div class="film-details__add-emoji-label">${isEmojiChecked ? emojiTemplate : ''}</div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea ${isSubmitting ? 'disabled' : ''} class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -148,7 +149,10 @@ export default class CardDetailsView extends AbstractStatefulView {
       emojiTemplate: null,
       isEmojiChecked: false,
       comment: { comment: '', emotion: '' },
-      scrollPosition: DEFAULT_SCROLL_POSITION
+      scrollPosition: DEFAULT_SCROLL_POSITION,
+      isDeleting: false,
+      isSubmitting: false,
+      deletingCommentId: '',
     });
     this.#handleCardDetailsCloseClick = onCardDetailsCloseClick;
     this.#handleWatchlistClick = onWatchlistClick;
@@ -238,6 +242,11 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #commentKeyDownHandler = (evt) => {
     if (evt.key === 'Enter' && evt.ctrlKey) {
+      this.updateElement({
+        isSubmitting: true,
+        scrollPosition: this.element.scrollTop
+      });
+      this.element.scrollTo(SCROLL_X_POSITION, this._state.scrollPosition);
       this.#handleCommentKeyDown(this._state.comment);
     }
   };
@@ -246,7 +255,12 @@ export default class CardDetailsView extends AbstractStatefulView {
     if (evt.target.tagName !== 'BUTTON') {
       return;
     }
-    evt.preventDefault();
+    this.updateElement({
+      isDeleting: true,
+      deletingCommentId: evt.target.dataset.id,
+      scrollPosition: this.element.scrollTop
+    });
+    this.element.scrollTo(SCROLL_X_POSITION, this._state.scrollPosition);
     this.#handleDeleteButtonClick(evt.target.dataset.id);
   };
 }

@@ -62,10 +62,6 @@ export default class CardDetailsPresenter {
     document.removeEventListener('keydown', this.#handleEscKeyDown);
   }
 
-  #handleDeleteButtonClick = (id) => {
-    this.#commentsModel.deleteComment(id);
-  };
-
   #handleWatchlistClick = () => {
     this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
     this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
@@ -90,6 +86,12 @@ export default class CardDetailsPresenter {
 
   #handleCommentKeyDown = (comment) => {
     this.#commentsModel.addComment(this.#card, comment);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+  };
+
+  #handleDeleteButtonClick = (id) => {
+    this.#commentsModel.deleteComment(id);
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
   };
 
   #handleModelEvent = () => {

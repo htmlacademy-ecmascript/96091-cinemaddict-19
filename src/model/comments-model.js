@@ -28,19 +28,26 @@ export default class CommentsModel extends Observable {
   }
 
   addComment(card, comment) {
-    return this.#commentsApiService.addComment(card, comment)
-      .then((response) => {
-        const updatedCard = adaptCardToClient(response.movie);
-        this.#comments = response.comments.map((it) => adaptCommentsToClient(it));
-        this._notify(updatedCard);
-      });
+    try {
+      return this.#commentsApiService.addComment(card, comment)
+        .then((response) => {
+          const updatedCard = adaptCardToClient(response.movie);
+          this.#comments = response.comments.map((it) => adaptCommentsToClient(it));
+          this._notify(updatedCard);
+        });} catch(err) {
+      throw new Error('Can\'t add comment');
+    }
   }
 
   deleteComment(id) {
-    return this.#commentsApiService.deleteComment(id)
-      .then(() => {
-        this.#comments = this.#comments.filter((comment) => comment.id !== id);
-        this._notify(this.#comments);
-      });
+    try {
+      return this.#commentsApiService.deleteComment(id)
+        .then(() => {
+          this.#comments = this.#comments.filter((comment) => comment.id !== id);
+          this._notify(this.#comments);
+        });
+    } catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
   }
 }
