@@ -1,30 +1,22 @@
 import {render, replace, remove} from '../framework/render.js';
 import CardView from '../view/card-view.js';
-import CardDetailsPresenter from './card-details-presenter.js';
 import {UserAction, UpdateType} from '../const.js';
 
 export default class CardPresenter {
   #mainComponent = null;
   #card = null;
   #cardComponent = null;
-  #cardDetailsPresenter = null;
   #handleViewAction = null;
-  #isCardDetailsShow = false;
-  #resetCardsDetails = null;
-  #commentsModel = null;
+  #showCardDetails = null;
 
   constructor(
     cardContainer,
-    resetCardsDetails,
+    showCardDetails,
     onViewAction,
-    commentsModel
   ) {
     this.#mainComponent = cardContainer;
-    this.#resetCardsDetails = resetCardsDetails;
+    this.#showCardDetails = showCardDetails;
     this.#handleViewAction = onViewAction;
-    this.#commentsModel = commentsModel;
-
-    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   init(card) {
@@ -47,12 +39,6 @@ export default class CardPresenter {
     if (this.#mainComponent.filmListContainer.contains(prevCardComponent.element)) {
       replace(this.#cardComponent, prevCardComponent);
     }
-
-    if (this.#cardDetailsPresenter !== null) {
-      const comments = this.#commentsModel.comments;
-      this.#cardDetailsPresenter.init(card, comments);
-    }
-
     remove(prevCardComponent);
   }
 
@@ -60,34 +46,8 @@ export default class CardPresenter {
     remove(this.#cardComponent);
   }
 
-  async #showCardDetails(card) {
-    await this.#commentsModel.init(card);
-    const comments = this.#commentsModel.comments;
-    this.#cardDetailsPresenter = new CardDetailsPresenter(
-      this.#handleCardDetailsCloseClick,
-      this.#handleWatchlistClick,
-      this.#handleWatchedClick,
-      this.#handleFavoriteClick,
-      this.#handleCommentKeyDown,
-      this.#handleDeleteButtonClick
-    );
-    this.#cardDetailsPresenter.init(card, comments);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#isCardDetailsShow = true;
-  }
-
-  #hideCardDetails() {
-    document.body.classList.remove('hide-overflow');
-    this.#cardDetailsPresenter.destroy();
-    this.#cardDetailsPresenter = null;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#isCardDetailsShow = false;
-  }
-
-  resetCardDetails() {
-    if (this.#isCardDetailsShow) {
-      this.#hideCardDetails();
-    }
+  setAborting() {
+    this.#cardComponent.shake();
   }
 
   #handleWatchlistClick = () => {
@@ -106,52 +66,6 @@ export default class CardPresenter {
   };
 
   #handleCardLinkClick = (card) => {
-    this.#resetCardsDetails();
     this.#showCardDetails(card);
   };
-
-  #handleCardDetailsCloseClick = () => {
-    this.#hideCardDetails();
-  };
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#hideCardDetails();
-    }
-  };
-
-  #handleCommentKeyDown = (comment) => {
-    this.#commentsModel.addComment(this.#card, comment);
-  };
-
-  #handleDeleteButtonClick = (id) => {
-    this.#commentsModel.deleteComment(id);
-  };
-
-  #handleModelEvent = () => {
-    this.init(this.#card);
-  };
-  //   switch (updateType) {
-  //     case UpdateType.FILTRATION:
-  //       this.#currentSortType = SortType.DEFAULT;
-  //       this.#isResetRenderedCardCount = true;
-  //       this.#clearCards();
-  //       this.#renderCards();
-  //       break;
-
-  //     case UpdateType.CARD_UPDATING:
-  //       this.#renderUser();
-  //       if (this.#filterModel.filter === FilterType.ALL) {
-  //         this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
-  //       } else if (filter[this.#filterModel.filter](this.#updatedCards).length) {
-  //         this.#cardPresenterMap.get(updatedCard.id).init(updatedCard);
-  //       } else {
-  //         this.#isResetRenderedCardCount = false;
-  //         this.#clearCards();
-  //         this.#renderCards();
-  //       }
-  //       break;
-  //   }
-  // };
 }
