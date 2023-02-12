@@ -236,7 +236,7 @@ export default class AppPresenter {
       case UpdateType.CARD_UPDATING:
         this.#renderUser();
 
-        if (this.#cardDetailsPresenter) {
+        if (this.#cardDetailsPresenter && this.#cardDetailsPresenter.card.id === updatedCard.id) {
           this.#cardDetailsPresenter.init(updatedCard);
         }
 

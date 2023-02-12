@@ -1,4 +1,3 @@
-
 function adaptCardToClient(card) {
   card.userDetails = card.user_details;
   card.userDetails.isInWatchlist = card.userDetails.watchlist;
@@ -59,10 +58,4 @@ function adaptCommentsToClient(comments) {
   return comments;
 }
 
-function adaptCommentsToServer(comments) {
-  comments.date = comments.date.toISOString();
-
-  return comments;
-}
-
-export {adaptCardToClient, adaptCardToServer, adaptCommentsToClient, adaptCommentsToServer};
+export {adaptCardToClient, adaptCardToServer, adaptCommentsToClient};

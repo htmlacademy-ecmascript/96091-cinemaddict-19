@@ -22,6 +22,10 @@ export default class CardDetailsPresenter {
     this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
+  get card() {
+    return this.#card;
+  }
+
   async init(card) {
     this.#card = card;
     await this.#commentsModel.init(card);
