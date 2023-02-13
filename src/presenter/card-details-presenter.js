@@ -2,6 +2,8 @@ import {render, replace, remove} from '../framework/render.js';
 import CardDetailsView from '../view/card-details-view.js';
 import {UserAction, UpdateType} from '../const.js';
 
+const SCROLL_X_POSITION = 0;
+
 export default class CardDetailsPresenter {
   #card = null;
   #comments = null;
@@ -66,19 +68,34 @@ export default class CardDetailsPresenter {
     document.removeEventListener('keydown', this.#handleEscKeyDown);
   }
 
+  setAbortingDetailsControls() {
+    this.#cardDetailsComponent.shakeDetailsControls();
+  }
+
+  setAbortingNewComment() {
+    this.#cardDetailsComponent.shakeDetailsNewComment();
+  }
+
+  setAbortingDeleteComment() {
+    this.#cardDetailsComponent.shakeDeleteComment();
+  }
+
   #handleWatchlistClick = () => {
-    this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
+    this.#handleViewAction(UserAction.UPDATE_CARD_FROM_DETAILS, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleWatchedClick = () => {
-    this.#card.userDetails.isWatched = !this.#card.userDetails.isWatched;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isWatched = !this.#card.userDetails.isWatched;
+    this.#handleViewAction(UserAction.UPDATE_CARD_FROM_DETAILS, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleFavoriteClick = () => {
-    this.#card.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
+    this.#handleViewAction(UserAction.UPDATE_CARD_FROM_DETAILS, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleEscKeyDown = (evt) => {
@@ -89,16 +106,23 @@ export default class CardDetailsPresenter {
   };
 
   #handleCommentKeyDown = (comment) => {
-    this.#commentsModel.addComment(this.#card, comment);
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    this.#commentsModel.addComment(copyCard, comment);
+    this.#handleViewAction(UserAction.ADD_COMMENT, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleDeleteButtonClick = (id) => {
     this.#commentsModel.deleteComment(id);
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    this.#handleViewAction(UserAction.DELETE_COMMENT, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleModelEvent = () => {
-    this.init(this.#card);
+    this.#cardDetailsComponent.updateElement({
+      isSubmitting: false,
+      deletingCommentId: '',
+      scrollPosition: this.#cardDetailsComponent.element.scrollTop
+    });
+    this.#cardDetailsComponent.element.scrollTo(SCROLL_X_POSITION, this.#cardDetailsComponent._state.scrollPosition);
   };
 }

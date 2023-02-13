@@ -19,6 +19,10 @@ export default class CardPresenter {
     this.#handleViewAction = onViewAction;
   }
 
+  get card() {
+    return this.#card;
+  }
+
   init(card) {
     this.#card = card;
     const prevCardComponent = this.#cardComponent;
@@ -51,18 +55,21 @@ export default class CardPresenter {
   }
 
   #handleWatchlistClick = () => {
-    this.#card.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isInWatchlist = !this.#card.userDetails.isInWatchlist;
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleWatchedClick = () => {
-    this.#card.userDetails.isWatched = !this.#card.userDetails.isWatched;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isWatched = !this.#card.userDetails.isWatched;
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleFavoriteClick = () => {
-    this.#card.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
-    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, this.#card);
+    const copyCard = structuredClone(this.#card);
+    copyCard.userDetails.isFavorite = !this.#card.userDetails.isFavorite;
+    this.#handleViewAction(UserAction.UPDATE_CARD, UpdateType.CARD_UPDATING, copyCard);
   };
 
   #handleCardLinkClick = (card) => {
