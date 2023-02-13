@@ -6,7 +6,7 @@ const DEFAULT_SCROLL_POSITION = 0;
 const SCROLL_X_POSITION = 0;
 
 function creatCardDetailsTemplate(card) {
-  const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked, isDeleting, isSubmitting, deletingCommentId} = card;
+  const {comments, filmInfo, userDetails, emojis, comment: newComment, isDeleting, isSubmitting, deletingCommentId} = card;
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -101,15 +101,15 @@ function creatCardDetailsTemplate(card) {
           </ul>
 
           <form class="film-details__new-comment" action="" ${isSubmitting ? 'disabled' : ''} method="get">
-            <div class="film-details__add-emoji-label">${isEmojiChecked ? emojiTemplate : ''}</div>
+            <div class="film-details__add-emoji-label">${newComment.emotion ? `<img src="./images/emoji/${newComment.emotion}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
 
             <label class="film-details__comment-label">
-              <textarea ${isSubmitting ? 'disabled' : ''} class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea ${isSubmitting ? 'disabled' : ''} class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment.comment}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
               ${emojis.map((emoji) => (`
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}" ${emoji === newComment.emotion ? 'checked' : ''}>
               <label class="film-details__emoji-label" for="emoji-${emoji}">
                 <img src="./images/emoji/${emoji}.png" width="30" height="30" alt="emoji">
               </label>
@@ -146,8 +146,6 @@ export default class CardDetailsView extends AbstractStatefulView {
       ...card,
       comments,
       emojis: ['smile', 'sleeping', 'puke', 'angry'],
-      emojiTemplate: null,
-      isEmojiChecked: false,
       comment: { comment: '', emotion: '' },
       scrollPosition: DEFAULT_SCROLL_POSITION,
       isDeleting: false,
@@ -218,26 +216,20 @@ export default class CardDetailsView extends AbstractStatefulView {
     }
 
     this.updateElement({
-      emojiTemplate: `<img src="./images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-smile">`,
-      isEmojiChecked: true,
-      scrollPosition: this.element.scrollTop
+      scrollPosition: this.element.scrollTop,
+      comment: {
+        ...this._state.comment,
+        emotion: evt.target.value,
+      },
     });
 
     this.element.scrollTo(SCROLL_X_POSITION, this._state.scrollPosition);
-
-    this.element.querySelectorAll('.film-details__emoji-item').forEach(
-      (element) => {
-        if (element.value === evt.target.value) {
-          element.checked = 'true';
-        }
-      }
-    );
-
-    this._setState({comment: { ...this._state.comment, emotion: evt.target.value}});
   };
 
   #commentInputHandler = (evt) => {
-    this._setState({comment: { ...this._state.comment, comment: evt.target.value.trim()}});
+    this._setState({comment: {
+      ...this._state.comment,
+      comment: evt.target.value.trim()}});
   };
 
   #commentKeyDownHandler = (evt) => {
