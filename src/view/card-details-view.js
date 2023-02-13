@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card-utils.js';
+import {humanizeReleaseDate, humanizeCommentDate, humanizeDuration} from '../utils/card-utils.js';
 import {EMOJI_IMAGES_SRC} from '../const.js';
 
 const DEFAULT_SCROLL_POSITION = 0;
@@ -52,7 +52,7 @@ function creatCardDetailsTemplate(card) {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Duration</td>
-                <td class="film-details__cell">${filmInfo.duration}</td>
+                <td class="film-details__cell">${humanizeDuration(filmInfo.duration)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>

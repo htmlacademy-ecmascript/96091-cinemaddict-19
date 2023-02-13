@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeReleaseDate, reduceDescription} from '../utils/card-utils.js';
+import {humanizeReleaseDate, reduceDescription, humanizeDuration} from '../utils/card-utils.js';
 
 function creatCardTemplate(card) {
   const {comments, filmInfo, userDetails} = card;
@@ -10,7 +10,7 @@ function creatCardTemplate(card) {
       <p class="film-card__rating">${filmInfo.totalRating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${humanizeReleaseDate(filmInfo.release.date)}</span>
-        <span class="film-card__duration">${filmInfo.duration}</span>
+        <span class="film-card__duration">${humanizeDuration(filmInfo.duration)}</span>
         <span class="film-card__genre">${filmInfo.genre[0]}</span>
       </p>
       <img src="${filmInfo.poster}" alt="" class="film-card__poster">

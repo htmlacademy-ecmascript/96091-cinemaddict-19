@@ -4,6 +4,13 @@ import {DESCRIPTION_MAX_LENGTH} from '../const.js';
 const FULL_DATE_FORMAT = 'DD MMMM YYYY';
 const SHORT_DATE_FORMAT = 'YYYY';
 const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:mm';
+const MINUTE_IN_HOUR = 60;
+
+function humanizeDuration(duration) {
+  const minuteCount = duration % MINUTE_IN_HOUR;
+  const hourCount = (duration - minuteCount) / MINUTE_IN_HOUR;
+  return `${hourCount}h ${minuteCount}m`;
+}
 
 function humanizeReleaseDate(date, isFullFormat = false) {
   if (isFullFormat) {
@@ -35,4 +42,4 @@ function reduceDescription(description, length = DESCRIPTION_MAX_LENGTH) {
   return `${description.slice(0, length - 1)}…`;
 }
 
-export {humanizeReleaseDate, reduceDescription, humanizeCommentDate};
+export {humanizeReleaseDate, reduceDescription, humanizeCommentDate, humanizeDuration};
