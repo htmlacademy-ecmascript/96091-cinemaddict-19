@@ -33,7 +33,6 @@ export default class CardDetailsPresenter {
     const prevCardDetailsComponent = this.#cardDetailsComponent;
 
     document.body.classList.add('hide-overflow');
-    document.addEventListener('keydown', this.#handleEscKeyDown);
 
     this.#cardDetailsComponent = new CardDetailsView(
       this.#card,
@@ -43,7 +42,8 @@ export default class CardDetailsPresenter {
       this.#handleWatchedClick,
       this.#handleFavoriteClick,
       this.#handleCommentKeyDown,
-      this.#handleDeleteButtonClick
+      this.#handleDeleteButtonClick,
+      this.#handleEscKeyDown
     );
 
     if (prevCardDetailsComponent === null) {

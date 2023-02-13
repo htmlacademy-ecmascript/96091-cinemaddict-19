@@ -130,6 +130,7 @@ export default class CardDetailsView extends AbstractStatefulView {
   #handleFavoriteClick = null;
   #handleCommentKeyDown = null;
   #handleDeleteButtonClick = null;
+  #handleEscKeyDown = null;
 
   constructor(
     card,
@@ -139,7 +140,8 @@ export default class CardDetailsView extends AbstractStatefulView {
     onWatchedClick,
     onFavoriteClick,
     onCommentKeyDown,
-    onDeleteButtonClick
+    onDeleteButtonClick,
+    onEscKeyDown
   ) {
     super();
     this._setState({
@@ -158,6 +160,7 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.#handleFavoriteClick = onFavoriteClick;
     this.#handleCommentKeyDown = onCommentKeyDown;
     this.#handleDeleteButtonClick = onDeleteButtonClick;
+    this.#handleEscKeyDown = onEscKeyDown;
     this._restoreHandlers();
   }
 
@@ -176,6 +179,7 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentKeyDownHandler);
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#deleteButtonClickHandler);
     this.element.addEventListener('scroll', this.#scrollPositionHandler);
+    document.addEventListener('keydown', this.#handleEscKeyDown);
   }
 
   getScrollPosition() {
@@ -192,6 +196,7 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #cardDetailsCloseClickHandler = (evt) => {
     evt.preventDefault();
+    document.removeEventListener('keydown', this.#handleEscKeyDown);
     this.#handleCardDetailsCloseClick();
   };
 
@@ -234,6 +239,7 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #commentKeyDownHandler = (evt) => {
     if (evt.key === 'Enter' && evt.ctrlKey) {
+      document.removeEventListener('keydown', this.#handleEscKeyDown);
       this.updateElement({
         isSubmitting: true,
         scrollPosition: this.element.scrollTop
