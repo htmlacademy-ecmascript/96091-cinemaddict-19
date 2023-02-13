@@ -220,6 +220,30 @@ export default class AppPresenter {
           this.#cardPresenterMap.get(updatedCard.id).setAborting();
         }
         break;
+
+      case UserAction.UPDATE_CARD_FROM_DETAILS:
+        try {
+          await this.#appModel.updateCard(updateType, updatedCard);
+        } catch(err) {
+          this.#cardDetailsPresenter.setAbortingDetailsControls();
+        }
+        break;
+
+      case UserAction.ADD_COMMENT:
+        try {
+          await this.#appModel.updateCard(updateType, updatedCard);
+        } catch(err) {
+          this.#cardDetailsPresenter.setAbortingNewComment();
+        }
+        break;
+
+      case UserAction.DELETE_COMMENT:
+        try {
+          await this.#appModel.updateCard(updateType, updatedCard);
+        } catch(err) {
+          this.#cardDetailsPresenter.setAbortingDeleteComment();
+        }
+        break;
     }
     this.#uiBlocker.unblock();
   };

@@ -1,12 +1,14 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizeReleaseDate, humanizeCommentDate} from '../utils/card-utils.js';
+import {humanizeReleaseDate, humanizeCommentDate, humanizeDuration} from '../utils/card-utils.js';
 import {EMOJI_IMAGES_SRC} from '../const.js';
 
 const DEFAULT_SCROLL_POSITION = 0;
 const SCROLL_X_POSITION = 0;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 function creatCardDetailsTemplate(card) {
-  const {comments, filmInfo, userDetails, emojis, emojiTemplate, isEmojiChecked, isDeleting, isSubmitting, deletingCommentId} = card;
+  const {comments, filmInfo, userDetails, emojis, comment: newComment, isDeleting, isSubmitting, deletingCommentId} = card;
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -52,7 +54,7 @@ function creatCardDetailsTemplate(card) {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Duration</td>
-                <td class="film-details__cell">${filmInfo.duration}</td>
+                <td class="film-details__cell">${humanizeDuration(filmInfo.duration)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
@@ -83,7 +85,7 @@ function creatCardDetailsTemplate(card) {
 
           <ul class="film-details__comments-list">
             ${comments.map((comment) => (
-    `<li class="film-details__comment">
+    `<li class="film-details__comment ${isDeleting && deletingCommentId === comment.id ? 'deleting' : ''}" >
       <span class="film-details__comment-emoji">
         <img src="${EMOJI_IMAGES_SRC[comment.emotion]}" width="55" height="55" alt="emoji-${comment.emotion}">
       </span>
@@ -101,15 +103,15 @@ function creatCardDetailsTemplate(card) {
           </ul>
 
           <form class="film-details__new-comment" action="" ${isSubmitting ? 'disabled' : ''} method="get">
-            <div class="film-details__add-emoji-label">${isEmojiChecked ? emojiTemplate : ''}</div>
+            <div class="film-details__add-emoji-label">${newComment.emotion ? `<img src="./images/emoji/${newComment.emotion}.png" width="55" height="55" alt="emoji-smile">` : ''}</div>
 
             <label class="film-details__comment-label">
-              <textarea ${isSubmitting ? 'disabled' : ''} class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea ${isSubmitting ? 'disabled' : ''} class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment.comment}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
               ${emojis.map((emoji) => (`
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}">
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emoji}" value="${emoji}" ${emoji === newComment.emotion ? 'checked' : ''}>
               <label class="film-details__emoji-label" for="emoji-${emoji}">
                 <img src="./images/emoji/${emoji}.png" width="30" height="30" alt="emoji">
               </label>
@@ -130,6 +132,7 @@ export default class CardDetailsView extends AbstractStatefulView {
   #handleFavoriteClick = null;
   #handleCommentKeyDown = null;
   #handleDeleteButtonClick = null;
+  #handleEscKeyDown = null;
 
   constructor(
     card,
@@ -139,15 +142,14 @@ export default class CardDetailsView extends AbstractStatefulView {
     onWatchedClick,
     onFavoriteClick,
     onCommentKeyDown,
-    onDeleteButtonClick
+    onDeleteButtonClick,
+    onEscKeyDown
   ) {
     super();
     this._setState({
       ...card,
       comments,
       emojis: ['smile', 'sleeping', 'puke', 'angry'],
-      emojiTemplate: null,
-      isEmojiChecked: false,
       comment: { comment: '', emotion: '' },
       scrollPosition: DEFAULT_SCROLL_POSITION,
       isDeleting: false,
@@ -160,6 +162,7 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.#handleFavoriteClick = onFavoriteClick;
     this.#handleCommentKeyDown = onCommentKeyDown;
     this.#handleDeleteButtonClick = onDeleteButtonClick;
+    this.#handleEscKeyDown = onEscKeyDown;
     this._restoreHandlers();
   }
 
@@ -178,6 +181,31 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentKeyDownHandler);
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#deleteButtonClickHandler);
     this.element.addEventListener('scroll', this.#scrollPositionHandler);
+    document.addEventListener('keydown', this.#handleEscKeyDown);
+  }
+
+  shakeDetailsControls(callback) {
+    this.element.querySelector('.film-details__controls').classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.film-details__controls').classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeDetailsNewComment(callback) {
+    this.element.querySelector('.film-details__new-comment').classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.film-details__new-comment').classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeDeleteComment(callback) {
+    this.element.querySelector('.deleting')?.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.deleting')?.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   getScrollPosition() {
@@ -194,6 +222,7 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #cardDetailsCloseClickHandler = (evt) => {
     evt.preventDefault();
+    document.removeEventListener('keydown', this.#handleEscKeyDown);
     this.#handleCardDetailsCloseClick();
   };
 
@@ -218,30 +247,25 @@ export default class CardDetailsView extends AbstractStatefulView {
     }
 
     this.updateElement({
-      emojiTemplate: `<img src="./images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-smile">`,
-      isEmojiChecked: true,
-      scrollPosition: this.element.scrollTop
+      scrollPosition: this.element.scrollTop,
+      comment: {
+        ...this._state.comment,
+        emotion: evt.target.value,
+      },
     });
 
     this.element.scrollTo(SCROLL_X_POSITION, this._state.scrollPosition);
-
-    this.element.querySelectorAll('.film-details__emoji-item').forEach(
-      (element) => {
-        if (element.value === evt.target.value) {
-          element.checked = 'true';
-        }
-      }
-    );
-
-    this._setState({comment: { ...this._state.comment, emotion: evt.target.value}});
   };
 
   #commentInputHandler = (evt) => {
-    this._setState({comment: { ...this._state.comment, comment: evt.target.value.trim()}});
+    this._setState({comment: {
+      ...this._state.comment,
+      comment: evt.target.value.trim()}});
   };
 
   #commentKeyDownHandler = (evt) => {
     if (evt.key === 'Enter' && evt.ctrlKey) {
+      document.removeEventListener('keydown', this.#handleEscKeyDown);
       this.updateElement({
         isSubmitting: true,
         scrollPosition: this.element.scrollTop
