@@ -4,6 +4,8 @@ import {EMOJI_IMAGES_SRC} from '../const.js';
 
 const DEFAULT_SCROLL_POSITION = 0;
 const SCROLL_X_POSITION = 0;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 function creatCardDetailsTemplate(card) {
   const {comments, filmInfo, userDetails, emojis, comment: newComment, isDeleting, isSubmitting, deletingCommentId} = card;
@@ -83,7 +85,7 @@ function creatCardDetailsTemplate(card) {
 
           <ul class="film-details__comments-list">
             ${comments.map((comment) => (
-    `<li class="film-details__comment">
+    `<li class="film-details__comment ${isDeleting && deletingCommentId === comment.id ? 'deleting' : ''}" >
       <span class="film-details__comment-emoji">
         <img src="${EMOJI_IMAGES_SRC[comment.emotion]}" width="55" height="55" alt="emoji-${comment.emotion}">
       </span>
@@ -130,6 +132,7 @@ export default class CardDetailsView extends AbstractStatefulView {
   #handleFavoriteClick = null;
   #handleCommentKeyDown = null;
   #handleDeleteButtonClick = null;
+  #handleEscKeyDown = null;
 
   constructor(
     card,
@@ -139,7 +142,8 @@ export default class CardDetailsView extends AbstractStatefulView {
     onWatchedClick,
     onFavoriteClick,
     onCommentKeyDown,
-    onDeleteButtonClick
+    onDeleteButtonClick,
+    onEscKeyDown
   ) {
     super();
     this._setState({
@@ -158,6 +162,7 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.#handleFavoriteClick = onFavoriteClick;
     this.#handleCommentKeyDown = onCommentKeyDown;
     this.#handleDeleteButtonClick = onDeleteButtonClick;
+    this.#handleEscKeyDown = onEscKeyDown;
     this._restoreHandlers();
   }
 
@@ -176,6 +181,31 @@ export default class CardDetailsView extends AbstractStatefulView {
     this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentKeyDownHandler);
     this.element.querySelector('.film-details__comments-list').addEventListener('click', this.#deleteButtonClickHandler);
     this.element.addEventListener('scroll', this.#scrollPositionHandler);
+    document.addEventListener('keydown', this.#handleEscKeyDown);
+  }
+
+  shakeDetailsControls(callback) {
+    this.element.querySelector('.film-details__controls').classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.film-details__controls').classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeDetailsNewComment(callback) {
+    this.element.querySelector('.film-details__new-comment').classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.film-details__new-comment').classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  shakeDeleteComment(callback) {
+    this.element.querySelector('.deleting')?.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      this.element.querySelector('.deleting')?.classList.remove(SHAKE_CLASS_NAME);
+      callback?.();
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   getScrollPosition() {
@@ -192,6 +222,7 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #cardDetailsCloseClickHandler = (evt) => {
     evt.preventDefault();
+    document.removeEventListener('keydown', this.#handleEscKeyDown);
     this.#handleCardDetailsCloseClick();
   };
 
@@ -234,6 +265,7 @@ export default class CardDetailsView extends AbstractStatefulView {
 
   #commentKeyDownHandler = (evt) => {
     if (evt.key === 'Enter' && evt.ctrlKey) {
+      document.removeEventListener('keydown', this.#handleEscKeyDown);
       this.updateElement({
         isSubmitting: true,
         scrollPosition: this.element.scrollTop
