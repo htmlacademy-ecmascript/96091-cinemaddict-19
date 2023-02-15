@@ -6,6 +6,10 @@ const EMOJI_IMAGES_SRC = {
 };
 
 const DESCRIPTION_MAX_LENGTH = 140;
+const DEFAULT_SCROLL_POSITION = 0;
+const SCROLL_X_POSITION = 0;
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const FilterType = {
   ALL: 'all',
@@ -48,5 +52,9 @@ export {
   SortType,
   UserAction,
   UpdateType,
-  Method
+  Method,
+  DEFAULT_SCROLL_POSITION,
+  SCROLL_X_POSITION,
+  SHAKE_CLASS_NAME,
+  SHAKE_ANIMATION_TIMEOUT
 };

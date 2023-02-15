@@ -27,25 +27,22 @@ export default class CommentsModel extends Observable {
     }
   }
 
-  addComment(card, comment) {
+  async addComment(card, comment) {
     try {
-      return this.#commentsApiService.addComment(card, comment)
-        .then((response) => {
-          const updatedCard = adaptCardToClient(response.movie);
-          this.#comments = response.comments.map((it) => adaptCommentsToClient(it));
-          this._notify(updatedCard);
-        });} catch(err) {
+      const response = await this.#commentsApiService.addComment(card, comment);
+      const updatedCard = adaptCardToClient(response.movie);
+      this.#comments = response.comments.map((it) => adaptCommentsToClient(it));
+      this._notify(updatedCard);
+    } catch(err) {
       throw new Error('Can\'t add comment');
     }
   }
 
-  deleteComment(id) {
+  async deleteComment(id) {
     try {
-      return this.#commentsApiService.deleteComment(id)
-        .then(() => {
-          this.#comments = this.#comments.filter((comment) => comment.id !== id);
-          this._notify(this.#comments);
-        });
+      await this.#commentsApiService.deleteComment(id);
+      this.#comments = this.#comments = this.#comments.filter((comment) => comment.id !== id);
+      this._notify(this.#comments);
     } catch(err) {
       throw new Error('Can\'t delete comment');
     }

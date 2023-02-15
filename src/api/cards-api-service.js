@@ -16,7 +16,6 @@ export default class CardsApiService extends ApiService {
       body: JSON.stringify(adaptCardToServer(card)),
       headers: new Headers({'Content-Type': 'application/json'}),
     });
-
     const parsedResponse = await ApiService.parseResponse(response);
 
     return parsedResponse;
