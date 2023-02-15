@@ -1,11 +1,12 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeReleaseDate, humanizeCommentDate, humanizeDuration} from '../utils/card-utils.js';
-import {EMOJI_IMAGES_SRC} from '../const.js';
-
-const DEFAULT_SCROLL_POSITION = 0;
-const SCROLL_X_POSITION = 0;
-const SHAKE_CLASS_NAME = 'shake';
-const SHAKE_ANIMATION_TIMEOUT = 600;
+import {
+  EMOJI_IMAGES_SRC,
+  DEFAULT_SCROLL_POSITION,
+  SCROLL_X_POSITION,
+  SHAKE_CLASS_NAME,
+  SHAKE_ANIMATION_TIMEOUT
+} from '../const.js';
 
 function creatCardDetailsTemplate(card) {
   const {comments, filmInfo, userDetails, emojis, comment: newComment, isDeleting, isSubmitting, deletingCommentId} = card;

@@ -31,14 +31,14 @@ export default class FilterView extends AbstractView {
     this.#currentFilterType = currentFilterType;
     this.#handleFilterTypeChange = onFilterTypeChange;
 
-    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+    this.element.addEventListener('click', this.#filterTypeClickHandler);
   }
 
   get template() {
     return createFilterTemplate(this.#filters, this.#currentFilterType);
   }
 
-  #filterTypeChangeHandler = (evt) => {
+  #filterTypeClickHandler = (evt) => {
     if (evt.target.tagName !== 'A' && evt.target.tagName !== 'SPAN') {
       return;
     }

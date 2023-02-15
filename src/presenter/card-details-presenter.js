@@ -1,8 +1,6 @@
 import {render, replace, remove} from '../framework/render.js';
 import CardDetailsView from '../view/card-details-view.js';
-import {UserAction, UpdateType} from '../const.js';
-
-const SCROLL_X_POSITION = 0;
+import {UserAction, UpdateType, SCROLL_X_POSITION, SHAKE_ANIMATION_TIMEOUT} from '../const.js';
 
 export default class CardDetailsPresenter {
   #card = null;
@@ -105,22 +103,36 @@ export default class CardDetailsPresenter {
     }
   };
 
-  #handleCommentKeyDown = (comment) => {
+  #handleCommentKeyDown = async (comment) => {
     const copyCard = structuredClone(this.#card);
-    this.#commentsModel.addComment(copyCard, comment);
-    this.#handleViewAction(UserAction.ADD_COMMENT, UpdateType.CARD_UPDATING, copyCard);
+    try {
+      await this.#commentsModel.addComment(copyCard, comment);
+      this.#handleViewAction(UserAction.ADD_COMMENT, UpdateType.CARD_UPDATING, copyCard);
+    } catch(err) {
+      this.setAbortingNewComment();
+      setTimeout(() => {
+        this.#handleModelEvent();
+      }, SHAKE_ANIMATION_TIMEOUT);
+    }
   };
 
-  #handleDeleteButtonClick = (id) => {
-    this.#commentsModel.deleteComment(id);
-    const copyCard = structuredClone(this.#card);
-    this.#handleViewAction(UserAction.DELETE_COMMENT, UpdateType.CARD_UPDATING, copyCard);
+  #handleDeleteButtonClick = async (id) => {
+    try {
+      await this.#commentsModel.deleteComment(id);
+      const copyCard = structuredClone(this.#card);
+      this.#handleViewAction(UserAction.DELETE_COMMENT, UpdateType.CARD_UPDATING, copyCard);
+    } catch(err) {
+      this.setAbortingDeleteComment();
+      setTimeout(() => {
+        this.#handleModelEvent();
+      }, SHAKE_ANIMATION_TIMEOUT);
+    }
   };
 
   #handleModelEvent = () => {
     this.#cardDetailsComponent.updateElement({
       isSubmitting: false,
-      deletingCommentId: '',
+      isDeleting: false,
       scrollPosition: this.#cardDetailsComponent.element.scrollTop
     });
     this.#cardDetailsComponent.element.scrollTo(SCROLL_X_POSITION, this.#cardDetailsComponent._state.scrollPosition);
